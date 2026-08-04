@@ -21,7 +21,7 @@ GitHub Pagesではルートの `index.html` を開き、30 FPSまたは60 FPSを
 ## キャッシュ対策
 
 ローカルCSS/JSのURLに、この公開版固有のクエリキーを付けています。
-次回更新時は `mobile1` を `mobile2` のように変更すると、端末に古いCSS/JSが残りにくくなります。
+次回更新時は `mobile1` を `mobile3` のように変更すると、端末に古いCSS/JSが残りにくくなります。
 
 ## CDN
 

@@ -357,7 +357,7 @@ button,input,select,textarea,summary{touch-action:manipulation;}
 
 
 /* =========================================================
-   mobile2 — iPad 4:3 / iPhone 16:9 viewport stabilization
+   mobile3 — iPad 4:3 / iPhone 16:9 viewport stabilization
    ========================================================= */
 :root{
   --mobile-safe-top:env(safe-area-inset-top,0px);
@@ -402,4 +402,27 @@ body.mobile-browser button,body.mobile-browser input,body.mobile-browser select,
 @media(max-width:900px) and (orientation:landscape){
   .topbar{bottom:max(3px,var(--mobile-safe-bottom));}
   .v662-operation-row{padding-bottom:max(2px,var(--mobile-safe-bottom));}
+}
+
+
+/* mobile3 smartphone usability */
+.pwa-guide-content{color:#b9ccd6;line-height:1.65}
+.pwa-guide-content p{margin:12px 0 0}
+.pwa-guide-content ol{margin:8px 0 0;padding-left:1.5em;display:grid;gap:8px}
+body.mobile-browser:not(.device-ipad){position:static;min-height:100dvh;height:auto;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
+body.mobile-browser:not(.device-ipad) .app-shell{position:relative;margin:0 auto;max-height:none}
+body.device-ipad.fullscreen-active,body.device-ipad.standalone-mode{position:fixed;inset:0;overflow:hidden;overscroll-behavior:none}
+@media (orientation:landscape) and (max-height:560px){
+  body.device-iphone,body.device-android{--dashboard-height:116px;--operation-height:88px;--status-height:28px;--top-nav-height:72px}
+  body.device-iphone .cab-console,body.device-android .cab-console{grid-template-rows:minmax(0,1fr) var(--status-height) var(--dashboard-height) var(--operation-height)!important}
+  body.device-iphone .dashboard,body.device-android .dashboard{padding:3px 5px!important;gap:4px!important}
+  body.device-iphone .dashboard .meter-card,body.device-android .dashboard .meter-card{padding:4px 6px!important}
+  body.device-iphone .current-speed,body.device-android .current-speed{font-size:clamp(28px,7vh,46px)!important}
+  body.device-iphone .atc-circle-shell,body.device-android .atc-circle-shell{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important;max-width:58px!important;max-height:58px!important}
+  body.device-iphone .atc-speed-value,body.device-android .atc-speed-value{font-size:27px!important}
+  body.device-iphone .v662-lower-console,body.device-android .v662-lower-console{grid-template-rows:22px minmax(0,1fr)!important}
+  body.device-iphone .v662-operation-row,body.device-android .v662-operation-row{grid-template-columns:58px repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr));gap:3px!important;padding:3px!important}
+  body.device-iphone .v662-operation-row .v662-row-label,body.device-android .v662-operation-row .v662-row-label{grid-row:1/3;white-space:normal;font-size:11px!important;line-height:1.1;text-align:center}
+  body.device-iphone .v662-op,body.device-android .v662-op{font-size:12px!important;line-height:1.08!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;padding:2px 4px!important;min-height:0}
+  body.device-iphone .v662-status-row>span,body.device-android .v662-status-row>span{font-size:9px!important}
 }
