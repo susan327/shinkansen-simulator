@@ -1314,8 +1314,10 @@ function createNoiseBuffer(context, duration) {
   return buffer;
 }
 
-const driverVoice = { enabled: true, rate: 0.90, pitch: 0.72, volume: 0.98 };
+const driverVoice = { enabled: true, rate: 0.90, pitch: 0.82, volume: 1.0 };
 let preferredMaleJapaneseVoice = null;
+const activeDriverUtterances = new Set();
+let driverVoiceUnlocked = false;
 function chooseMaleJapaneseVoice(){
   if(!("speechSynthesis" in window)) return null;
   const voices = window.speechSynthesis.getVoices();
@@ -1325,6 +1327,7 @@ function chooseMaleJapaneseVoice(){
   preferredMaleJapaneseVoice = japanese.find(v => maleHint.test(`${v.name} ${v.voiceURI}`))
     || japanese.find(v => !femaleHint.test(`${v.name} ${v.voiceURI}`))
     || japanese[0]
+    || voices.find(v => /ja/i.test(v.lang || ""))
     || null;
   return preferredMaleJapaneseVoice;
 }
@@ -1332,57 +1335,70 @@ if("speechSynthesis" in window){
   chooseMaleJapaneseVoice();
   window.speechSynthesis.addEventListener?.("voiceschanged", chooseMaleJapaneseVoice);
 }
-function updateDriverVoiceDisplay(){
+function updateDriverVoiceDisplay(message=""){
   if(ui.driverVoiceToggle) ui.driverVoiceToggle.checked = driverVoice.enabled;
-  if(ui.driverVoiceStatus) ui.driverVoiceStatus.textContent = driverVoice.enabled ? "自動喚呼 ON・男性声優先" : "自動喚呼 OFF";
+  if(ui.driverVoiceStatus) ui.driverVoiceStatus.textContent = message || (driverVoice.enabled ? "自動喚呼 ON" : "自動喚呼 OFF");
 }
-let driverVoiceUnlocked = false;
+function retainDriverUtterance(utterance){
+  activeDriverUtterances.add(utterance);
+  const release = () => activeDriverUtterances.delete(utterance);
+  utterance.addEventListener?.("end", release, {once:true});
+  utterance.addEventListener?.("error", event => {
+    release();
+    if(event.error !== "interrupted" && event.error !== "canceled") updateDriverVoiceDisplay("自動喚呼 音声エラー");
+  }, {once:true});
+  return utterance;
+}
+function makeDriverUtterance(spokenText){
+  const utterance = retainDriverUtterance(new SpeechSynthesisUtterance(spokenText));
+  utterance.lang = "ja-JP";
+  utterance.rate = driverVoice.rate;
+  utterance.pitch = driverVoice.pitch;
+  utterance.volume = driverVoice.volume;
+  const voice = preferredMaleJapaneseVoice || chooseMaleJapaneseVoice();
+  if(voice) utterance.voice = voice;
+  utterance.addEventListener?.("start", () => updateDriverVoiceDisplay("自動喚呼 再生中"), {once:true});
+  utterance.addEventListener?.("end", () => updateDriverVoiceDisplay(), {once:true});
+  return utterance;
+}
 function unlockDriverVoice(){
-  if(!("speechSynthesis" in window) || driverVoiceUnlocked) return;
+  if(!("speechSynthesis" in window)) return false;
   try{
     window.speechSynthesis.resume();
-    const primer = new SpeechSynthesisUtterance(" ");
-    primer.lang = "ja-JP";
-    primer.volume = 0;
-    window.speechSynthesis.speak(primer);
     driverVoiceUnlocked = true;
     chooseMaleJapaneseVoice();
-  }catch(_){ }
+    return true;
+  }catch(_){ return false; }
 }
-["pointerdown","touchend","keydown"].forEach(type => document.addEventListener(type, unlockDriverVoice, {once:true, passive:true}));
+["pointerdown","touchend","keydown"].forEach(type => document.addEventListener(type, unlockDriverVoice, {passive:true}));
 function speakDriverCall(text, spokenText = text, {cancel = true} = {}){
-  if(!driverVoice.enabled || !sound.enabled || !("speechSynthesis" in window)) return;
+  if(!driverVoice.enabled || !("speechSynthesis" in window)) return;
   unlockDriverVoice();
-  window.speechSynthesis.resume();
+  const synth = window.speechSynthesis;
   const speak = () => {
-    const utterance = new SpeechSynthesisUtterance(spokenText);
-    utterance.lang = "ja-JP";
-    utterance.rate = driverVoice.rate;
-    utterance.pitch = driverVoice.pitch;
-    utterance.volume = driverVoice.volume;
-    const voice = preferredMaleJapaneseVoice || chooseMaleJapaneseVoice();
-    if(voice) utterance.voice = voice;
-    window.speechSynthesis.speak(utterance);
+    try{ synth.resume(); synth.speak(makeDriverUtterance(spokenText)); }
+    catch(_){ updateDriverVoiceDisplay("自動喚呼 音声エラー"); }
   };
-  if(cancel){ window.speechSynthesis.cancel(); setTimeout(speak, 45); }
-  else speak();
+  if(cancel){
+    synth.cancel();
+    // iOS Safari/PWAではcancel直後のspeakが捨てられることがあるため、十分待って再開する。
+    setTimeout(speak, 180);
+  } else speak();
 }
 function speakDriverSequence(items){
-  if(!driverVoice.enabled || !sound.enabled || !("speechSynthesis" in window)) return;
+  if(!driverVoice.enabled || !("speechSynthesis" in window)) return;
   unlockDriverVoice();
-  window.speechSynthesis.resume();
-  window.speechSynthesis.cancel();
-  const voice = preferredMaleJapaneseVoice || chooseMaleJapaneseVoice();
-  setTimeout(() => { for(const item of items){
-    const spoken = typeof item === "string" ? item : item.spoken;
-    const utterance = new SpeechSynthesisUtterance(spoken);
-    utterance.lang = "ja-JP";
-    utterance.rate = driverVoice.rate;
-    utterance.pitch = driverVoice.pitch;
-    utterance.volume = driverVoice.volume;
-    if(voice) utterance.voice = voice;
-    window.speechSynthesis.speak(utterance);
-  } }, 45);
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  setTimeout(() => {
+    try{
+      synth.resume();
+      for(const item of items){
+        const spoken = typeof item === "string" ? item : item.spoken;
+        synth.speak(makeDriverUtterance(spoken));
+      }
+    }catch(_){ updateDriverVoiceDisplay("自動喚呼 音声エラー"); }
+  }, 180);
 }
 function callSignal(speed){ speakDriverCall(`信号${speed}`, `しんごう、${speed}`); }
 function callTarget(speed){ speakDriverCall(`目標${speed}`, `もくひょう、${speed}`); }
@@ -5320,7 +5336,7 @@ if(ui.brake70TestButtonPanel) ui.brake70TestButtonPanel.addEventListener("click"
 if(ui.doorOpenTestButton) ui.doorOpenTestButton.addEventListener("click",()=>{ensureAudioContext();playDoorOpenSound();});
 if(ui.doorCloseTestButton) ui.doorCloseTestButton.addEventListener("click",()=>{ensureAudioContext();playDoorCloseSound();});
 if(ui.boardingBuzzerTestButton) ui.boardingBuzzerTestButton.addEventListener("click",()=>{ensureAudioContext();playBoardingBuzzer();});
-if(ui.driverVoiceToggle) ui.driverVoiceToggle.addEventListener("change",()=>{driverVoice.enabled=ui.driverVoiceToggle.checked;updateDriverVoiceDisplay();});
+if(ui.driverVoiceToggle) ui.driverVoiceToggle.addEventListener("change",()=>{driverVoice.enabled=ui.driverVoiceToggle.checked;updateDriverVoiceDisplay();if(driverVoice.enabled)speakDriverCall("自動喚呼開始", "じどうかんこ、かいし", {cancel:true});else if("speechSynthesis" in window)window.speechSynthesis.cancel();});
 if(ui.voiceDoorTestButton) ui.voiceDoorTestButton.addEventListener("click",()=>speakDriverCall("戸閉め点", "とじめてん"));
 if(ui.voiceDepartTestButton) ui.voiceDepartTestButton.addEventListener("click",()=>speakDriverCall("出発進行", "しゅっぱつ、しんこう"));
 if(ui.voiceSignalTestButton) ui.voiceSignalTestButton.addEventListener("click",()=>callSignal(300));
@@ -5812,13 +5828,12 @@ if(document.readyState==="loading"){
 
 
 
-// mobile3: iPad 4:3 / iPhone 16:9, platform-specific PWA guidance and stable touch behavior.
+// mobile4: iPad 4:3 / iPhone 16:9, platform-specific PWA guidance and stable touch behavior.
 (() => {
   const root = document.documentElement;
   const body = document.body;
   const appShell = document.querySelector(".app-shell");
   const fullscreenButton = document.getElementById("fullscreenButton");
-  const orientationFullscreenButton = document.getElementById("orientationFullscreenButton");
   const orientationGuard = document.getElementById("orientationGuard");
   const pwaGuide = document.getElementById("pwaGuide");
   const pwaGuideButton = document.getElementById("pwaGuideButton");
@@ -5850,8 +5865,8 @@ if(document.readyState==="loading"){
   function renderPwaGuide() {
     if (!pwaGuideContent || !pwaGuideTitle) return;
     if (standalone) {
-      pwaGuideTitle.textContent = "ホーム画面から起動中です";
-      pwaGuideContent.innerHTML = `<p>現在はアプリ表示で起動しています。このまま横向きで運転できます。</p>`;
+      pwaGuideTitle.textContent = "アプリ表示で起動中です";
+      pwaGuideContent.innerHTML = `<p>ホーム画面版はすでに起動できています。再インストールは不要です。</p><p>GitHub側を更新した場合は、アプリをいったん完全に閉じて開き直すと最新版を確認できます。</p>`;
     } else if (android) {
       pwaGuideTitle.textContent = "Androidでアプリ表示にする方法";
       pwaGuideContent.innerHTML = `
@@ -5907,7 +5922,7 @@ if(document.readyState==="loading"){
     const active = Boolean(document.fullscreenElement || document.webkitFullscreenElement || standalone);
     body.classList.toggle("fullscreen-active", active);
     if (fullscreenButton) {
-      fullscreenButton.textContent = standalone ? "アプリ表示中" : (active ? "全画面終了" : ((iPhone || iPad) ? "ホーム追加案内" : "全画面"));
+      fullscreenButton.textContent = standalone ? "PWA案内" : (active ? "全画面終了" : ((iPhone || iPad) ? "ホーム追加案内" : "全画面"));
     }
   };
 
@@ -5933,6 +5948,7 @@ if(document.readyState==="loading"){
   }
 
   async function toggleCockpitFullscreen() {
+    if (standalone) { showPwaGuide(); return; }
     if ((iPhone || iPad) && !standalone) { showPwaGuide(); return; }
     if (document.fullscreenElement || document.webkitFullscreenElement) {
       try {
@@ -5943,11 +5959,6 @@ if(document.readyState==="loading"){
   }
 
   fullscreenButton?.addEventListener("click", toggleCockpitFullscreen);
-  orientationFullscreenButton?.addEventListener("click", () => {
-    if (window.matchMedia("(orientation: landscape)").matches) {
-      if ((iPhone || iPad) && !standalone) showPwaGuide(); else enterCockpitFullscreen();
-    }
-  });
   pwaGuideButton?.addEventListener("click", showPwaGuide);
   pwaGuideClose?.addEventListener("click", hidePwaGuide);
   pwaGuide?.addEventListener("click", event => { if (event.target === pwaGuide) hidePwaGuide(); });
