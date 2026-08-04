@@ -357,7 +357,7 @@ button,input,select,textarea,summary{touch-action:manipulation;}
 
 
 /* =========================================================
-   mobile3 — iPad 4:3 / iPhone 16:9 viewport stabilization
+   mobile4 — iPad 4:3 / iPhone 16:9 viewport stabilization
    ========================================================= */
 :root{
   --mobile-safe-top:env(safe-area-inset-top,0px);
@@ -405,7 +405,7 @@ body.mobile-browser button,body.mobile-browser input,body.mobile-browser select,
 }
 
 
-/* mobile3 smartphone usability */
+/* mobile4 smartphone usability */
 .pwa-guide-content{color:#b9ccd6;line-height:1.65}
 .pwa-guide-content p{margin:12px 0 0}
 .pwa-guide-content ol{margin:8px 0 0;padding-left:1.5em;display:grid;gap:8px}
@@ -425,4 +425,29 @@ body.device-ipad.fullscreen-active,body.device-ipad.standalone-mode{position:fix
   body.device-iphone .v662-operation-row .v662-row-label,body.device-android .v662-operation-row .v662-row-label{grid-row:1/3;white-space:normal;font-size:11px!important;line-height:1.1;text-align:center}
   body.device-iphone .v662-op,body.device-android .v662-op{font-size:12px!important;line-height:1.08!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;padding:2px 4px!important;min-height:0}
   body.device-iphone .v662-status-row>span,body.device-android .v662-status-row>span{font-size:9px!important}
+}
+
+
+/* mobile4: wider forward view and compact instrument panel on phones */
+@media (orientation:landscape) and (max-height:620px){
+  body.device-iphone,body.device-android{
+    --dashboard-height:84px;
+    --operation-height:82px;
+    --status-height:24px;
+    --top-nav-height:64px;
+  }
+  body.device-iphone .cab-console,body.device-android .cab-console{
+    grid-template-rows:minmax(0,1fr) var(--status-height) var(--dashboard-height) var(--operation-height)!important;
+  }
+  body.device-iphone .dashboard,body.device-android .dashboard{padding:2px 4px!important;gap:3px!important}
+  body.device-iphone .dashboard .meter-card,body.device-android .dashboard .meter-card{padding:2px 5px!important;min-height:0!important}
+  body.device-iphone .dashboard .meter-label,body.device-android .dashboard .meter-label{font-size:9px!important;line-height:1!important}
+  body.device-iphone .current-speed,body.device-android .current-speed{font-size:clamp(24px,6vh,38px)!important;line-height:.95!important}
+  body.device-iphone .speed-unit,body.device-android .speed-unit{font-size:9px!important}
+  body.device-iphone .atc-circle-shell,body.device-android .atc-circle-shell{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;max-width:48px!important;max-height:48px!important}
+  body.device-iphone .atc-speed-value,body.device-android .atc-speed-value{font-size:22px!important}
+  body.device-iphone .distance-value,body.device-android .distance-value{font-size:clamp(20px,5vh,32px)!important;line-height:1!important}
+  body.device-iphone .dashboard canvas,body.device-android .dashboard canvas{max-height:64px!important}
+  body.device-iphone .v662-status-row,body.device-android .v662-status-row{min-height:0!important}
+  body.device-iphone .v662-op,body.device-android .v662-op{font-size:11px!important;line-height:1.05!important}
 }
