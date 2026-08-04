@@ -1336,23 +1336,44 @@ function updateDriverVoiceDisplay(){
   if(ui.driverVoiceToggle) ui.driverVoiceToggle.checked = driverVoice.enabled;
   if(ui.driverVoiceStatus) ui.driverVoiceStatus.textContent = driverVoice.enabled ? "自動喚呼 ON・男性声優先" : "自動喚呼 OFF";
 }
+let driverVoiceUnlocked = false;
+function unlockDriverVoice(){
+  if(!("speechSynthesis" in window) || driverVoiceUnlocked) return;
+  try{
+    window.speechSynthesis.resume();
+    const primer = new SpeechSynthesisUtterance(" ");
+    primer.lang = "ja-JP";
+    primer.volume = 0;
+    window.speechSynthesis.speak(primer);
+    driverVoiceUnlocked = true;
+    chooseMaleJapaneseVoice();
+  }catch(_){ }
+}
+["pointerdown","touchend","keydown"].forEach(type => document.addEventListener(type, unlockDriverVoice, {once:true, passive:true}));
 function speakDriverCall(text, spokenText = text, {cancel = true} = {}){
   if(!driverVoice.enabled || !sound.enabled || !("speechSynthesis" in window)) return;
-  if(cancel) window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(spokenText);
-  utterance.lang = "ja-JP";
-  utterance.rate = driverVoice.rate;
-  utterance.pitch = driverVoice.pitch;
-  utterance.volume = driverVoice.volume;
-  const voice = preferredMaleJapaneseVoice || chooseMaleJapaneseVoice();
-  if(voice) utterance.voice = voice;
-  window.speechSynthesis.speak(utterance);
+  unlockDriverVoice();
+  window.speechSynthesis.resume();
+  const speak = () => {
+    const utterance = new SpeechSynthesisUtterance(spokenText);
+    utterance.lang = "ja-JP";
+    utterance.rate = driverVoice.rate;
+    utterance.pitch = driverVoice.pitch;
+    utterance.volume = driverVoice.volume;
+    const voice = preferredMaleJapaneseVoice || chooseMaleJapaneseVoice();
+    if(voice) utterance.voice = voice;
+    window.speechSynthesis.speak(utterance);
+  };
+  if(cancel){ window.speechSynthesis.cancel(); setTimeout(speak, 45); }
+  else speak();
 }
 function speakDriverSequence(items){
   if(!driverVoice.enabled || !sound.enabled || !("speechSynthesis" in window)) return;
+  unlockDriverVoice();
+  window.speechSynthesis.resume();
   window.speechSynthesis.cancel();
   const voice = preferredMaleJapaneseVoice || chooseMaleJapaneseVoice();
-  for(const item of items){
+  setTimeout(() => { for(const item of items){
     const spoken = typeof item === "string" ? item : item.spoken;
     const utterance = new SpeechSynthesisUtterance(spoken);
     utterance.lang = "ja-JP";
@@ -1361,7 +1382,7 @@ function speakDriverSequence(items){
     utterance.volume = driverVoice.volume;
     if(voice) utterance.voice = voice;
     window.speechSynthesis.speak(utterance);
-  }
+  } }, 45);
 }
 function callSignal(speed){ speakDriverCall(`信号${speed}`, `しんごう、${speed}`); }
 function callTarget(speed){ speakDriverCall(`目標${speed}`, `もくひょう、${speed}`); }
@@ -5791,7 +5812,7 @@ if(document.readyState==="loading"){
 
 
 
-// mobile2: iPad 4:3 / iPhone 16:9, Safari-safe viewport and PWA guidance.
+// mobile3: iPad 4:3 / iPhone 16:9, platform-specific PWA guidance and stable touch behavior.
 (() => {
   const root = document.documentElement;
   const body = document.body;
@@ -5802,25 +5823,48 @@ if(document.readyState==="loading"){
   const pwaGuide = document.getElementById("pwaGuide");
   const pwaGuideButton = document.getElementById("pwaGuideButton");
   const pwaGuideClose = document.getElementById("pwaGuideClose");
+  const pwaGuideTitle = document.getElementById("pwaGuideTitle");
+  const pwaGuideContent = document.getElementById("pwaGuideContent");
   const deviceHint = document.getElementById("orientationDeviceHint");
 
   const ua = navigator.userAgent || "";
   const coarse = window.matchMedia("(pointer: coarse)").matches;
   const iPad = /iPad/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const iPhone = /iPhone|iPod/.test(ua);
-  const mobile = coarse && (iPad || iPhone || Math.min(screen.width, screen.height) <= 900);
+  const android = /Android/i.test(ua);
+  const mobile = coarse && (iPad || iPhone || android || Math.min(screen.width, screen.height) <= 900);
   const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 
   body.classList.toggle("device-ipad", iPad);
-  body.classList.toggle("device-iphone", iPhone || (mobile && !iPad));
+  body.classList.toggle("device-iphone", iPhone || (mobile && !iPad && !android));
+  body.classList.toggle("device-android", android);
   body.classList.toggle("device-desktop", !mobile);
-  body.classList.toggle("mobile-browser", mobile);
+  body.classList.toggle("mobile-browser", mobile && !standalone);
   body.classList.toggle("standalone-mode", standalone);
   body.classList.add("mobile-viewport-ready");
 
   if (deviceHint) {
-    deviceHint.textContent = iPad ? "iPadでは4:3表示に最適化します" : "iPhoneでは16:9表示に最適化します";
+    deviceHint.textContent = iPad ? "iPadでは4:3表示に最適化します" : "スマートフォンでは16:9表示に最適化します";
   }
+
+  function renderPwaGuide() {
+    if (!pwaGuideContent || !pwaGuideTitle) return;
+    if (standalone) {
+      pwaGuideTitle.textContent = "ホーム画面から起動中です";
+      pwaGuideContent.innerHTML = `<p>現在はアプリ表示で起動しています。このまま横向きで運転できます。</p>`;
+    } else if (android) {
+      pwaGuideTitle.textContent = "Androidでアプリ表示にする方法";
+      pwaGuideContent.innerHTML = `
+        <ol><li>Chrome右上の「︙」を押す</li><li>「アプリをインストール」または「ホーム画面に追加」を選ぶ</li><li>追加したアイコンから横向きで起動する</li></ol>
+        <p>インストール候補が表示される端末では、画面の案内に従って追加してください。</p>`;
+    } else {
+      pwaGuideTitle.textContent = "iPhone・iPadでアプリ表示にする方法";
+      pwaGuideContent.innerHTML = `
+        <ol><li>Safariの共有ボタン「□↑」を押す</li><li>メニューを下へ進み「ホーム画面に追加」を選ぶ</li><li>右上の「追加」を押す</li><li>ホーム画面の新幹線ATCアイコンから横向きで起動する</li></ol>
+        <p>Safari内では上部・下部バーで運転画面が狭くなるため、ホーム画面からの起動がおすすめです。</p>`;
+    }
+  }
+  renderPwaGuide();
 
   const viewportSize = () => ({
     width: Math.max(1, window.visualViewport?.width || window.innerWidth),
@@ -5832,6 +5876,7 @@ if(document.readyState==="loading"){
     const { width, height } = viewportSize();
     root.style.setProperty("--visual-viewport-width", `${width}px`);
     root.style.setProperty("--visual-viewport-height", `${height}px`);
+    root.style.setProperty("--mobile-safe-bottom", `${Math.max(0, window.innerHeight - height)}px`);
 
     if (!mobile) {
       appShell.style.width = `${width}px`;
@@ -5862,18 +5907,15 @@ if(document.readyState==="loading"){
     const active = Boolean(document.fullscreenElement || document.webkitFullscreenElement || standalone);
     body.classList.toggle("fullscreen-active", active);
     if (fullscreenButton) {
-      fullscreenButton.textContent = standalone ? "ホーム起動中" : (active ? "全画面終了" : (iPhone ? "ホーム画面案内" : "全画面"));
+      fullscreenButton.textContent = standalone ? "アプリ表示中" : (active ? "全画面終了" : ((iPhone || iPad) ? "ホーム追加案内" : "全画面"));
     }
   };
 
-  function showPwaGuide() { if (pwaGuide) pwaGuide.hidden = false; }
+  function showPwaGuide() { renderPwaGuide(); if (pwaGuide) pwaGuide.hidden = false; }
   function hidePwaGuide() { if (pwaGuide) pwaGuide.hidden = true; }
 
   async function enterCockpitFullscreen() {
-    if (iPhone && !standalone) {
-      showPwaGuide();
-      return;
-    }
+    if ((iPhone || iPad) && !standalone) { showPwaGuide(); return; }
     try {
       if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (appShell?.requestFullscreen) await appShell.requestFullscreen({ navigationUI: "hide" });
@@ -5884,29 +5926,27 @@ if(document.readyState==="loading"){
       console.warn("Fullscreen request was rejected:", error);
       if (mobile && !standalone) showPwaGuide();
     } finally {
-      setTimeout(updateMobileViewport, 0);
-      setTimeout(updateMobileViewport, 120);
-      setTimeout(updateMobileViewport, 350);
+      [0, 120, 350].forEach(delay => setTimeout(updateMobileViewport, delay));
       refreshFullscreenUi();
       refreshOrientationGuard();
     }
   }
 
   async function toggleCockpitFullscreen() {
-    if (iPhone && !standalone) { showPwaGuide(); return; }
+    if ((iPhone || iPad) && !standalone) { showPwaGuide(); return; }
     if (document.fullscreenElement || document.webkitFullscreenElement) {
       try {
         if (document.exitFullscreen) await document.exitFullscreen();
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
       } catch (_) {}
-    } else {
-      await enterCockpitFullscreen();
-    }
+    } else await enterCockpitFullscreen();
   }
 
   fullscreenButton?.addEventListener("click", toggleCockpitFullscreen);
   orientationFullscreenButton?.addEventListener("click", () => {
-    if (window.matchMedia("(orientation: landscape)").matches) enterCockpitFullscreen();
+    if (window.matchMedia("(orientation: landscape)").matches) {
+      if ((iPhone || iPad) && !standalone) showPwaGuide(); else enterCockpitFullscreen();
+    }
   });
   pwaGuideButton?.addEventListener("click", showPwaGuide);
   pwaGuideClose?.addEventListener("click", hidePwaGuide);
@@ -5916,16 +5956,14 @@ if(document.readyState==="loading"){
   document.addEventListener("webkitfullscreenchange", () => { refreshFullscreenUi(); updateMobileViewport(); });
   window.addEventListener("resize", () => { refreshOrientationGuard(); updateMobileViewport(); }, { passive: true });
   window.addEventListener("orientationchange", () => {
-    setTimeout(refreshOrientationGuard, 80);
-    setTimeout(updateMobileViewport, 120);
-    setTimeout(updateMobileViewport, 400);
+    [80, 180, 450].forEach(delay => setTimeout(() => { refreshOrientationGuard(); updateMobileViewport(); }, delay));
   }, { passive: true });
   window.visualViewport?.addEventListener("resize", updateMobileViewport, { passive: true });
-  window.visualViewport?.addEventListener("scroll", updateMobileViewport, { passive: true });
 
-  // Suppress page rubber-banding only while the complete cockpit is fitted on screen.
+  // PWA/fullscreenはページ移動を止める。通常のスマホブラウザでは必要時に縦スクロールを許可する。
   document.addEventListener("touchmove", event => {
-    if (mobile && !body.classList.contains("orientation-blocked")) event.preventDefault();
+    const locked = standalone || document.fullscreenElement || document.webkitFullscreenElement;
+    if (locked && mobile && !body.classList.contains("orientation-blocked")) event.preventDefault();
   }, { passive: false });
 
   updateMobileViewport();
