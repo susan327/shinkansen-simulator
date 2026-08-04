@@ -4,19 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>v74.4.3-alpha21-route-strip-step2x | 新幹線 ATC シミュレーター</title>
-  <link rel="stylesheet" href="css/base.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/layout.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/navigation.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/dashboard.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/controls.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/cockpit-controls.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/responsive.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/features/boarding.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/features/collision.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/features/operation-guidance.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/features/atc-display.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-<link rel="stylesheet" href="css/features/loading.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
-  <link rel="stylesheet" href="css/features/performance-monitor.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+  <meta name="theme-color" content="#020507">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="新幹線ATC">
+  <link rel="manifest" href="manifest.webmanifest?v=mobile2">
+  <link rel="apple-touch-icon" href="icons/icon-192.png?v=mobile2">
+  <link rel="stylesheet" href="css/base.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/layout.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/navigation.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/dashboard.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/controls.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/cockpit-controls.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/responsive.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/features/boarding.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/features/collision.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/features/operation-guidance.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/features/atc-display.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+<link rel="stylesheet" href="css/features/loading.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
+  <link rel="stylesheet" href="css/features/performance-monitor.css?v=74.4.3-alpha21-route-strip-step2x-mobile2">
 </head>
 <body>
 <div id="initialLoadingOverlay" class="initial-loading-overlay" aria-live="polite">
@@ -45,8 +51,17 @@
     <div class="orientation-card">
       <div class="rotate-device" aria-hidden="true">📱</div>
       <strong>スマホを横向きにしてください</strong>
-      <span>v74.4.3-alpha21-route-strip-step2xは横画面専用です</span>
-      <button id="orientationFullscreenButton" class="primary-button" type="button">横向きでフルスクリーン</button>
+      <span>横画面専用です。横向きにすると自動で運転台を表示します。</span>
+      <button id="orientationFullscreenButton" class="primary-button" type="button">横向きで起動</button>
+      <button id="pwaGuideButton" class="secondary-button orientation-guide-button" type="button">ホーム画面への追加方法</button>
+      <small id="orientationDeviceHint" class="orientation-device-hint"></small>
+    </div>
+  </div>
+  <div id="pwaGuide" class="pwa-guide" hidden>
+    <div class="pwa-guide-card">
+      <button id="pwaGuideClose" class="pwa-guide-close" type="button" aria-label="閉じる">×</button>
+      <h2>ホーム画面から起動する方法</h2>
+      <p>Safariの共有ボタンを押し、「ホーム画面に追加」を選んでください。ホーム画面のアイコンから起動すると、ブラウザのバーが減って操作しやすくなります。</p>
     </div>
   </div>
   <main class="app-shell">
@@ -554,92 +569,92 @@
       document.write('<script src="https://unpkg.com/three@0.160.0/build/three.min.js"><\/script>');
     }
   </script>
-  <script src="js/train/specs/TrainReferenceSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/RailPlatformDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/TrainVerticalDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/specs/TrainConsistSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/specs/BogieSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/designer/TrainDesignerSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/designer/TrainDesignStore.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/specs/TrainExteriorSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/specs/BodyProfileSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/specs/TrainClearanceSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/TrainGeometrySpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/core/config.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/content/routes/main-route/route-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/content/stations/station-configs.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-<script src="js/world/stations/StationTrackSpacingSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-<script src="js/world/stations/StationTurnoutSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/stations/StationWorldSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-<script src="js/world/stations/StationStructureSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-<script src="js/world/stations/StationLayoutValidation.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-<script src="js/world/stations/TrackLayoutBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/stations/PassengerZoneSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/content/routes/main-route/roadbed-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/roadbed/roadbed-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/roadbed/roadbed-renderer.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/content/routes/main-route/structure-segments.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/core/event-bus.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/route/route-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/track/track-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/stations/station-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/scenery-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/content/routes/main-route/scenery-zone-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/terrain/clearance-manager.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/terrain/terrain-surface.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/urban-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/commercial-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/residential-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/orchard-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/rural-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/hilly-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/mountain-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/industrial-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/solar-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/highway-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/harbor-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/coast-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/world/scenery/zones/river-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/systems/timetable/timetable-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/ui/driving-graph/driving-graph-view.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/core/math-utils.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/systems/departure/departure-sequence.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/systems/atc/atc-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/systems/train/train-physics.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/TrainDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/materials/TrainMaterials.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/geometry/TrainShapeProfile.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/geometry/TrainLeadGeometry.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/geometry/TrainUnderbodyGeometry.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/parts/helpers.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/body.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/roof.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/doors.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/windows.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/bogie.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/underfloor.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/pantograph.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/skirt.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/parts/cab.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/parts/lead-aero.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/parts/lead-car.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/builders/UnderbodyShieldBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/builders/LeadCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/builders/MiddleCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/builders/TailCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/debug/TrainGeometryDebug.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/debug/TrainValidation.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/builders/TrainConsistBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/placement/TrainPlacement.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/runtime/TrainInstance.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/rendering/TrainRenderAdapter.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/train-builder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/core/app.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/systems/train/train-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/systems/atc/atc-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/ui/ui-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/ui/operation-panel-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/stations/specs/StationTrackLayoutSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/stations/specs/StationVerticalLayout.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/stations/platform-layout.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/boarding/boarding-camera.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/boarding/passenger-path.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/train/consist-spec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/boarding/boarding-scene-system.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
-  <script src="js/systems/station/boarding-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/specs/TrainReferenceSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/RailPlatformDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/TrainVerticalDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/specs/TrainConsistSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/specs/BogieSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/designer/TrainDesignerSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script><script src="js/train/designer/TrainDesignStore.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script><script src="js/train/specs/TrainExteriorSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/specs/BodyProfileSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/specs/TrainClearanceSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/TrainGeometrySpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/core/config.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/content/routes/main-route/route-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/content/stations/station-configs.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+<script src="js/world/stations/StationTrackSpacingSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+<script src="js/world/stations/StationTurnoutSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/stations/StationWorldSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+<script src="js/world/stations/StationStructureSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+<script src="js/world/stations/StationLayoutValidation.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+<script src="js/world/stations/TrackLayoutBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/stations/PassengerZoneSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/content/routes/main-route/roadbed-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/roadbed/roadbed-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/roadbed/roadbed-renderer.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/content/routes/main-route/structure-segments.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/core/event-bus.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/route/route-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/track/track-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/stations/station-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/scenery-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/content/routes/main-route/scenery-zone-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/terrain/clearance-manager.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/terrain/terrain-surface.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/urban-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/commercial-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/residential-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/orchard-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/rural-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/hilly-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/mountain-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/industrial-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/solar-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/highway-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/harbor-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/coast-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/world/scenery/zones/river-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/systems/timetable/timetable-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/ui/driving-graph/driving-graph-view.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/core/math-utils.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/systems/departure/departure-sequence.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/systems/atc/atc-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/systems/train/train-physics.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/TrainDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/materials/TrainMaterials.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/geometry/TrainShapeProfile.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script><script src="js/train/geometry/TrainLeadGeometry.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script><script src="js/train/geometry/TrainUnderbodyGeometry.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script><script src="js/train/parts/helpers.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/body.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/roof.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/doors.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/windows.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/bogie.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/underfloor.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/pantograph.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/skirt.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/parts/cab.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script><script src="js/train/parts/lead-aero.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script><script src="js/train/parts/lead-car.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/builders/UnderbodyShieldBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/builders/LeadCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/builders/MiddleCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/builders/TailCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/debug/TrainGeometryDebug.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/debug/TrainValidation.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/builders/TrainConsistBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/placement/TrainPlacement.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/runtime/TrainInstance.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/rendering/TrainRenderAdapter.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/train-builder.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/core/app.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/systems/train/train-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/systems/atc/atc-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/ui/ui-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/ui/operation-panel-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/stations/specs/StationTrackLayoutSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/stations/specs/StationVerticalLayout.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/stations/platform-layout.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/boarding/boarding-camera.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/boarding/passenger-path.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/train/consist-spec.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/boarding/boarding-scene-system.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+  <script src="js/systems/station/boarding-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
 
 <div id="performanceMonitor" class="performance-monitor" hidden aria-hidden="true">
   <div class="performance-monitor__header">
@@ -649,6 +664,11 @@
   <div id="performanceMonitorGrid" class="performance-monitor__grid"></div>
   <div class="performance-monitor__note">※ CPU/GPU使用率そのものではなく、ブラウザから取得できる処理時間と描画統計です。スクリーンショット比較用。</div>
 </div>
-  <script src="js/ui/performance-monitor.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/ui/performance-monitor.js?v=74.4.3-alpha21-route-strip-step2x-mobile2"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js?v=mobile2").catch(console.warn));
+}
+</script>
 </body>
 </html>

@@ -1,0 +1,26 @@
+{
+  "name": "新幹線ATCシミュレーター",
+  "short_name": "新幹線ATC",
+  "start_url": "./simulator.html?fps=30&pwa=1",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
+  "orientation": "landscape",
+  "background_color": "#020507",
+  "theme_color": "#020507",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
