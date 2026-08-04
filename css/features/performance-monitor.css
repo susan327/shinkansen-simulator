@@ -1,0 +1,18 @@
+#performanceMonitorButton{position:relative;z-index:10001}
+.performance-monitor{position:fixed;inset:0;z-index:10000;padding:10px 16px 7px;background:rgba(3,8,14,.91);color:#eaf8ff;font-family:Consolas,"SFMono-Regular",Menlo,monospace;box-sizing:border-box;overflow:hidden;backdrop-filter:blur(2px)}
+.performance-monitor[hidden]{display:none}
+.performance-monitor__header{height:48px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(112,214,255,.55)}
+.performance-monitor__header strong{font-size:20px;letter-spacing:.08em;color:#7ee7ff}
+.performance-monitor__header span{margin-left:12px;font-size:11px;color:#a9bdc8}
+.performance-monitor__header button{pointer-events:auto;border:1px solid #7ee7ff;background:rgba(0,31,48,.95);color:#fff;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer}
+.performance-monitor__grid{height:calc(100vh - 70px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:10px 12px;padding-top:9px;box-sizing:border-box}
+.performance-card{border:1px solid rgba(126,231,255,.27);background:rgba(0,15,25,.54);border-radius:9px;padding:9px 11px;min-width:0;min-height:0;overflow:hidden}
+.performance-card h3{margin:0 0 7px;font:700 13px/1.2 system-ui,sans-serif;letter-spacing:.06em;color:#79dcff}
+.performance-row{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:10px;align-items:baseline;padding:3px 0;font-size:11px;line-height:1.25;border-bottom:1px solid rgba(126,231,255,.045)}
+.performance-row:last-child{border-bottom:0}
+.performance-row span:first-child{color:#a8bbc5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.performance-row output{font-weight:700;color:#fff;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.performance-row output.warn{color:#ffd66b}.performance-row output.bad{color:#ff8b8b}
+.performance-monitor__note{display:none}
+.performance-reset{border:1px solid rgba(126,231,255,.7);background:rgba(0,40,58,.85);color:#fff;border-radius:5px;padding:2px 8px;font:700 10px/1.2 system-ui,sans-serif;cursor:pointer}
+@media(max-width:1250px){.performance-monitor{padding:7px 9px 5px}.performance-monitor__header{height:40px}.performance-monitor__header strong{font-size:16px}.performance-monitor__grid{height:calc(100vh - 53px);gap:6px 7px;padding-top:6px}.performance-card{padding:6px 7px}.performance-card h3{font-size:11px;margin-bottom:4px}.performance-row{font-size:9px;grid-template-columns:minmax(0,1fr) 135px;gap:6px;padding:2px 0}}

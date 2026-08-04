@@ -1,0 +1,28 @@
+/* v71.3.1 — side controllers and lower operation panel. */
+.power-control-card,.brake-control-card{
+  height:100%;min-height:0;margin:0!important;padding:10px 8px!important;border-radius:0!important;
+  display:flex!important;flex-direction:column;overflow:hidden;background:linear-gradient(180deg,#161c21,#080b0e 72%)!important
+}
+.power-control-card{border-left:2px solid #293640!important}.brake-control-card{border-right:2px solid #293640!important}
+.power-control-card .control-header,.brake-control-card .control-header{display:block!important;text-align:center;margin:0 0 7px!important}
+.power-control-card h2,.brake-control-card h2{margin:0 0 6px;font-size:clamp(16px,1.1vw,22px)!important}
+.power-control-card .section-kicker,.brake-control-card .section-kicker{display:none!important}
+.power-control-card .notch-display,.brake-control-card .notch-display{
+  display:inline-flex!important;min-width:84px;min-height:48px;align-items:center;justify-content:center;
+  padding:4px 11px!important;font-size:clamp(30px,2.35vw,44px)!important;line-height:1!important;border-radius:9px
+}
+.power-lever-assembly,.brake-lever-assembly{width:100%;max-width:150px;flex:1;min-height:0;margin:0 auto}
+.power-scale,.brake-scale{font-size:clamp(13px,1vw,19px)!important;font-weight:900!important}
+.power-slot,.brake-track{height:100%}
+.power-control-card .lever-fallback,.power-control-card>p,.brake-control-card>p{display:none!important}
+.brake-control-card .brake-actions{display:grid!important;grid-template-columns:1fr;gap:5px;margin-top:6px}
+.brake-control-card .brake-actions button{display:none!important}
+.brake-control-card #brakeFullReleaseButton{display:block!important;min-height:48px;font-size:clamp(16px,1.15vw,21px)!important;font-weight:900}
+.operation-control-card{height:100%;min-height:0;padding:4px 8px!important;overflow:hidden;background:#080d10!important}
+.operation-control-card>.control-header,.v662-hidden-telemetry,.floating-mixer-panel{display:none!important}
+.v662-lower-console{height:100%;min-height:0;display:grid;grid-template-rows:30px minmax(0,1fr);gap:4px}
+.v662-status-row{display:grid!important;grid-template-columns:96px repeat(5,minmax(0,1fr))!important;min-height:30px;height:30px!important}
+.v662-status-row>span{font-size:clamp(10px,.72vw,14px)!important;padding:2px 6px!important}
+.v662-operation-row{display:grid!important;grid-template-columns:104px repeat(6,minmax(0,1fr))!important;gap:5px!important;padding:4px!important;min-height:0;height:100%!important}
+.v662-operation-row .v662-row-label{font-size:clamp(15px,1.02vw,20px)!important}
+.v662-op{height:100%!important;min-height:0!important;padding:5px 8px!important;font-size:clamp(17px,1.2vw,22px)!important;font-weight:900!important;line-height:1.05!important;border-radius:8px!important}

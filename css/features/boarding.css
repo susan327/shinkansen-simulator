@@ -1,0 +1,26 @@
+/* v66.4: 40秒乗降タイマー／スキップ */
+.boarding-guide{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;z-index:8;max-width:90%;}
+.boarding-guide .door-scene-message{position:static;transform:none;min-width:min(540px,68vw);}
+.boarding-skip-button{border:1px solid #ffc94d;border-radius:10px;background:linear-gradient(180deg,#80621e,#4d390d);color:#fff4c9;font-weight:900;font-size:15px;padding:13px 18px;white-space:nowrap;cursor:pointer;box-shadow:0 0 6px rgba(255,201,77,.35);animation:v664SoftPulse 1.25s ease-in-out infinite;}
+.v662-op.boarding-skip{background:linear-gradient(180deg,#8a681d,#4f390c);border-color:#d7a62e;color:#fff1b8;}
+@keyframes v664SoftPulse{0%,100%{box-shadow:0 0 4px rgba(255,201,77,.28),inset 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 17px rgba(255,201,77,.78),inset 0 0 10px rgba(255,240,180,.12)}}
+@media(max-width:900px){.boarding-guide{bottom:8px;gap:6px}.boarding-guide .door-scene-message{min-width:55vw;font-size:13px}.boarding-skip-button{font-size:12px;padding:10px 11px}}
+
+/* v67.0: Three.js boarding scene */
+.v67-three-boarding{background:#111;overflow:hidden}
+#boardingCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+.v67-boarding-hud{position:absolute;inset:0;z-index:2;pointer-events:none}
+.v67-three-boarding .platform-roof,
+.v67-three-boarding .car-side,
+.v67-three-boarding .platform-floor{display:none!important}
+.v67-three-boarding .door-scene-title{position:absolute;top:14px;left:18px;background:rgba(3,12,20,.74);padding:9px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(6px)}
+.v67-three-boarding .door-scene-message{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);min-width:min(520px,82%);text-align:center;background:rgba(3,12,20,.78);padding:11px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.22);box-shadow:0 8px 28px rgba(0,0,0,.35)}
+.v67-three-boarding::after{content:"THREE.JS BOARDING VIEW";position:absolute;right:16px;top:16px;z-index:3;font:700 10px/1.2 system-ui;letter-spacing:.16em;color:rgba(255,255,255,.72);background:rgba(0,0,0,.38);padding:6px 9px;border-radius:999px;pointer-events:none}
+
+/* v68.3: departure-time skip and boarding controls */
+.v67-three-boarding .boarding-guide{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:10px;z-index:9;width:min(96%,980px);pointer-events:auto;}
+.v67-three-boarding .boarding-guide .door-scene-message{position:static;left:auto;bottom:auto;transform:none;min-width:min(420px,52vw);}
+.departure-time-skip-button{border:1px solid #65d7ff;border-radius:10px;background:linear-gradient(180deg,#155d75,#0a3445);color:#e9fbff;font-weight:900;font-size:14px;padding:12px 16px;white-space:nowrap;cursor:pointer;box-shadow:0 0 12px rgba(77,207,255,.38);}
+.departure-time-skip-button:hover{filter:brightness(1.14);}
+.departure-time-skip-button:disabled{opacity:.42;cursor:not-allowed;box-shadow:none;}
+@media(max-width:900px){.v67-three-boarding .boarding-guide{bottom:7px;gap:5px;flex-wrap:wrap}.departure-time-skip-button{font-size:11px;padding:9px 10px}.v67-three-boarding .boarding-guide .door-scene-message{min-width:52vw}}

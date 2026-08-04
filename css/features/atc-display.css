@@ -1,0 +1,28 @@
+/* v70.5.4 responsive ATC sizing: the same variable drives width and height */
+@media (max-height: 820px) {
+  .atc-cab-display {
+    --atc-circle-size: clamp(76px, min(6.7vw, 10.8vh), 94px);
+  }
+}
+@media (max-width: 1100px) {
+  .atc-cab-display {
+    --atc-circle-size: clamp(78px, min(8.2vw, 11vh), 108px);
+  }
+}
+@media (max-width: 760px) {
+  .atc-cab-display {
+    --atc-circle-size: clamp(88px, min(20vw, 16vh), 116px);
+  }
+}
+@media (max-height: 620px) {
+  .atc-cab-display {
+    --atc-circle-size: clamp(82px, min(15vw, 18vh), 112px);
+  }
+}
+
+
+/* v70.5.5: JS toggles bright/dark states directly; never interpolate them. */
+.atc-circle-shell.atc-pattern-flash {
+  transition: none !important;
+  animation: none !important;
+}

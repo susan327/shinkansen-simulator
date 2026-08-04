@@ -1,0 +1,58 @@
+/* v71.3.1 — central instruments. */
+.dashboard{
+  display:grid!important;grid-template-columns:1.05fr .88fr 1.05fr 1.55fr!important;
+  gap:7px!important;padding:6px 8px!important;overflow:hidden!important;background:#080d10
+}
+.dashboard .meter-card{min-width:0;min-height:0;height:100%;padding:8px 11px!important;overflow:hidden;border-radius:8px!important;background:linear-gradient(180deg,#0b1216,#05090b)!important}
+.speed-card .meter-value{font-size:clamp(36px,3.5vw,64px)!important}
+.next-station-card .meter-value{font-size:clamp(27px,2.45vw,45px)!important}
+.atc-card{display:grid!important;place-items:center!important;padding:5px!important}
+.atc-cab-display{
+  width:100%;height:100%;min-height:0;
+  display:grid!important;grid-template-rows:20px 92px!important;
+  justify-items:center!important;align-content:center!important;row-gap:5px!important;padding:0!important
+}
+.atc-cab-label{
+  position:static!important;transform:none!important;
+  align-self:end!important;margin:0!important;padding:0!important;
+  font-size:17px!important;line-height:20px!important;letter-spacing:.1em!important;z-index:2
+}
+.atc-circle-shell{
+  position:relative!important;width:90px!important;height:90px!important;min-width:90px!important;min-height:90px!important;
+  max-width:90px!important;max-height:90px!important;aspect-ratio:1;border-radius:50%;flex:none!important;
+  align-self:start!important;justify-self:center!important;overflow:hidden!important
+}
+.atc-speed-value{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  display:grid!important;place-items:center!important;margin:0!important;padding:0!important;
+  transform:none!important;line-height:1!important;font-size:40px!important;text-align:center!important
+}
+/* v71.3.3 — graph rows are explicitly bounded so the canvas cannot collide with labels. */
+.driving-graph-card{
+  display:grid!important;
+  grid-template-rows:34px minmax(0,1fr) 22px!important;
+  gap:2px!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.driving-graph-head{
+  min-width:0;min-height:0;position:relative;z-index:2;
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;gap:8px!important;overflow:hidden!important;
+}
+.driving-graph-head>div:first-child{min-width:0;display:flex;align-items:baseline;gap:7px;overflow:hidden}
+.driving-graph-head .meter-label{flex:none;font-size:10px!important;line-height:1!important}
+.driving-graph-head .prediction-time{min-width:0;font-size:18px!important;line-height:1!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.graph-difference{display:flex!important;align-items:center!important;gap:6px!important;white-space:nowrap;font-size:9px!important;line-height:1!important}
+.graph-difference strong{font-size:11px!important;line-height:1!important}
+#drivingGraphCanvas{
+  display:block;width:100%!important;height:100%!important;
+  min-width:0!important;min-height:0!important;align-self:stretch!important;
+}
+.driving-graph-footer{
+  min-width:0;min-height:0;position:relative;z-index:2;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:8px!important;overflow:hidden!important;font-size:9px!important;line-height:1!important;
+}
+.graph-legend{display:flex!important;align-items:center;gap:8px;min-width:0;white-space:nowrap}
+.driving-graph-footer .small-readout{padding-top:0!important;border-top:0!important;gap:5px!important;font-size:9px!important;white-space:nowrap}

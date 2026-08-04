@@ -1,0 +1,41 @@
+/* v71.3.1 — desktop 16:9 first, then compact landscape fallbacks. */
+@media (min-width:1200px) and (min-aspect-ratio:16/10){
+ :root{--dashboard-height:178px;--operation-height:92px;--status-height:38px}
+}
+@media(max-height:900px){
+ :root{--top-nav-height:90px;--status-height:36px;--dashboard-height:166px;--operation-height:84px}
+ .route-panel{top:5px;padding:6px 10px 7px}
+ .route-line-wrap{height:43px;padding:11px 12px 17px!important}
+ .sim-speed-control{grid-template-columns:repeat(4,44px);gap:5px}.sim-speed-control button{min-width:44px;height:28px;min-height:28px;font-size:13px}
+ .atc-cab-display{grid-template-rows:18px 82px!important;row-gap:4px!important}
+ .atc-cab-label{font-size:15px!important;line-height:18px!important}
+ .atc-circle-shell{width:80px!important;height:80px!important;min-width:80px!important;min-height:80px!important;max-width:80px!important;max-height:80px!important}
+ .atc-speed-value{font-size:36px!important}
+ .v662-lower-console{grid-template-rows:28px minmax(0,1fr)}
+ .v662-status-row{height:28px!important;min-height:28px}
+ .v662-operation-row{padding:3px!important;gap:4px!important}
+ .v662-op{font-size:16px!important}
+}
+@media(max-height:760px){
+ :root{--top-nav-height:82px;--status-height:32px;--dashboard-height:150px;--operation-height:74px}
+ .route-panel{width:min(660px,calc(100vw - (var(--side-controller-width) * 2) - 18px))}
+ .route-heading h2{font-size:13px}.route-line-wrap{height:38px;padding:9px 10px 15px!important}
+ .route-line .station b{font-size:10px}.route-line .station small{font-size:7px}
+ .dashboard{padding:4px 6px!important;gap:5px!important}
+ .dashboard .meter-card{padding:5px 8px!important}
+ .atc-cab-display{grid-template-rows:16px 70px!important;row-gap:2px!important}
+ .atc-cab-label{font-size:14px!important;line-height:16px!important}
+ .atc-circle-shell{width:68px!important;height:68px!important;min-width:68px!important;min-height:68px!important;max-width:68px!important;max-height:68px!important}
+ .atc-speed-value{font-size:31px!important}
+ .v662-lower-console{grid-template-rows:24px minmax(0,1fr);gap:2px}
+ .v662-status-row{height:24px!important;min-height:24px}.v662-status-row>span{font-size:10px!important;padding:1px 4px!important}
+ .v662-operation-row{grid-template-columns:74px repeat(6,minmax(0,1fr))!important;padding:2px!important;gap:3px!important}
+ .v662-operation-row .v662-row-label{font-size:13px!important}.v662-op{font-size:14px!important;padding:2px 5px!important}
+}
+@media(max-width:1100px){
+ :root{--side-controller-width:126px}
+ .route-panel{left:calc(var(--side-controller-width) + 6px);max-width:calc(100vw - (var(--side-controller-width) * 2) - 12px)}
+ .dashboard{grid-template-columns:1fr .82fr 1fr 1.35fr!important}
+ .v662-operation-row{grid-template-columns:78px repeat(6,minmax(0,1fr))!important}
+}
+@media(orientation:portrait) and (max-width:900px){.orientation-guard{display:flex!important}}

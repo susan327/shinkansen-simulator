@@ -1,0 +1,22 @@
+/* v71.3.1 — compact route navigation. */
+.route-panel{
+  height:var(--top-nav-height);margin:0;padding:8px 12px 9px;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:30px 1fr;
+  column-gap:12px;row-gap:2px;overflow:hidden;
+  border:1px solid rgba(105,205,244,.28);border-radius:12px;
+  background:rgba(5,10,14,.9);backdrop-filter:blur(5px);box-shadow:0 8px 22px rgba(0,0,0,.25)
+}
+.route-heading{display:contents!important}
+.route-heading>div:first-child{grid-column:1;grid-row:1;min-width:0;align-self:center}
+.route-heading h2{margin:0;padding:0!important;font-size:clamp(14px,1.05vw,19px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.route-heading .section-kicker,.sim-speed-control>span{display:none!important}
+.sim-speed-control{grid-column:2;grid-row:1;position:static!important;display:grid!important;grid-template-columns:repeat(4,48px);gap:6px;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
+.sim-speed-control button{min-width:48px;min-height:30px;height:30px;padding:2px 5px;border-radius:7px;font-size:14px;font-weight:900}
+.route-line-wrap{grid-column:1/3;grid-row:2;min-width:0;height:47px;margin:0!important;padding:13px 14px 19px!important;align-self:end;overflow:visible}
+.route-line{position:relative;height:10px!important;min-height:10px!important;border-radius:999px}
+.route-line::after{height:10px!important}
+.route-line .station{top:-2px;overflow:visible}
+.route-line .station span{width:18px!important;height:18px!important;margin-bottom:3px!important}
+.route-line .station b{font-size:clamp(10px,.72vw,13px);line-height:1.05;margin-top:0!important}
+.route-line .station small{font-size:clamp(7px,.56vw,10px);line-height:1.05;margin-top:2px;white-space:nowrap}
+.train-marker{top:-27px!important;font-size:18px!important}
