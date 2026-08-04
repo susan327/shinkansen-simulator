@@ -5791,47 +5791,109 @@ if(document.readyState==="loading"){
 
 
 
-// v66.0: landscape-only mobile cockpit and fixed fullscreen mode.
+// mobile2: iPad 4:3 / iPhone 16:9, Safari-safe viewport and PWA guidance.
 (() => {
   const root = document.documentElement;
+  const body = document.body;
+  const appShell = document.querySelector(".app-shell");
   const fullscreenButton = document.getElementById("fullscreenButton");
   const orientationFullscreenButton = document.getElementById("orientationFullscreenButton");
   const orientationGuard = document.getElementById("orientationGuard");
+  const pwaGuide = document.getElementById("pwaGuide");
+  const pwaGuideButton = document.getElementById("pwaGuideButton");
+  const pwaGuideClose = document.getElementById("pwaGuideClose");
+  const deviceHint = document.getElementById("orientationDeviceHint");
 
-  const isCompactTouchDevice = () =>
-    window.matchMedia("(pointer: coarse)").matches &&
-    Math.min(screen.width, screen.height) <= 900;
+  const ua = navigator.userAgent || "";
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  const iPad = /iPad/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const iPhone = /iPhone|iPod/.test(ua);
+  const mobile = coarse && (iPad || iPhone || Math.min(screen.width, screen.height) <= 900);
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+
+  body.classList.toggle("device-ipad", iPad);
+  body.classList.toggle("device-iphone", iPhone || (mobile && !iPad));
+  body.classList.toggle("device-desktop", !mobile);
+  body.classList.toggle("mobile-browser", mobile);
+  body.classList.toggle("standalone-mode", standalone);
+  body.classList.add("mobile-viewport-ready");
+
+  if (deviceHint) {
+    deviceHint.textContent = iPad ? "iPadでは4:3表示に最適化します" : "iPhoneでは16:9表示に最適化します";
+  }
+
+  const viewportSize = () => ({
+    width: Math.max(1, window.visualViewport?.width || window.innerWidth),
+    height: Math.max(1, window.visualViewport?.height || window.innerHeight)
+  });
+
+  function updateMobileViewport() {
+    if (!appShell) return;
+    const { width, height } = viewportSize();
+    root.style.setProperty("--visual-viewport-width", `${width}px`);
+    root.style.setProperty("--visual-viewport-height", `${height}px`);
+
+    if (!mobile) {
+      appShell.style.width = `${width}px`;
+      appShell.style.height = `${height}px`;
+      return;
+    }
+
+    const ratio = iPad ? 4 / 3 : 16 / 9;
+    let targetWidth = width;
+    let targetHeight = targetWidth / ratio;
+    if (targetHeight > height) {
+      targetHeight = height;
+      targetWidth = targetHeight * ratio;
+    }
+    appShell.style.width = `${Math.floor(targetWidth)}px`;
+    appShell.style.height = `${Math.floor(targetHeight)}px`;
+  }
 
   const refreshOrientationGuard = () => {
     const portrait = window.matchMedia("(orientation: portrait)").matches;
-    const shouldGuard = isCompactTouchDevice() && portrait;
+    const shouldGuard = mobile && portrait;
     orientationGuard?.classList.toggle("visible", shouldGuard);
-    document.body.classList.toggle("orientation-blocked", shouldGuard);
+    body.classList.toggle("orientation-blocked", shouldGuard);
+    if (!shouldGuard) updateMobileViewport();
   };
 
   const refreshFullscreenUi = () => {
-    const active = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
-    document.body.classList.toggle("fullscreen-active", active);
-    if (fullscreenButton) fullscreenButton.textContent = active ? "フルスクリーン終了" : "フルスクリーン";
+    const active = Boolean(document.fullscreenElement || document.webkitFullscreenElement || standalone);
+    body.classList.toggle("fullscreen-active", active);
+    if (fullscreenButton) {
+      fullscreenButton.textContent = standalone ? "ホーム起動中" : (active ? "全画面終了" : (iPhone ? "ホーム画面案内" : "全画面"));
+    }
   };
 
+  function showPwaGuide() { if (pwaGuide) pwaGuide.hidden = false; }
+  function hidePwaGuide() { if (pwaGuide) pwaGuide.hidden = true; }
+
   async function enterCockpitFullscreen() {
+    if (iPhone && !standalone) {
+      showPwaGuide();
+      return;
+    }
     try {
-      const target = document.querySelector(".app-shell") || root;
       if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (target.requestFullscreen) await target.requestFullscreen({ navigationUI: "hide" });
-        else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+        if (appShell?.requestFullscreen) await appShell.requestFullscreen({ navigationUI: "hide" });
+        else if (appShell?.webkitRequestFullscreen) appShell.webkitRequestFullscreen();
       }
       try { await screen.orientation?.lock?.("landscape"); } catch (_) {}
     } catch (error) {
       console.warn("Fullscreen request was rejected:", error);
+      if (mobile && !standalone) showPwaGuide();
     } finally {
+      setTimeout(updateMobileViewport, 0);
+      setTimeout(updateMobileViewport, 120);
+      setTimeout(updateMobileViewport, 350);
       refreshFullscreenUi();
       refreshOrientationGuard();
     }
   }
 
   async function toggleCockpitFullscreen() {
+    if (iPhone && !standalone) { showPwaGuide(); return; }
     if (document.fullscreenElement || document.webkitFullscreenElement) {
       try {
         if (document.exitFullscreen) await document.exitFullscreen();
@@ -5843,17 +5905,30 @@ if(document.readyState==="loading"){
   }
 
   fullscreenButton?.addEventListener("click", toggleCockpitFullscreen);
-  orientationFullscreenButton?.addEventListener("click", enterCockpitFullscreen);
-  document.addEventListener("fullscreenchange", refreshFullscreenUi);
-  document.addEventListener("webkitfullscreenchange", refreshFullscreenUi);
-  window.addEventListener("resize", refreshOrientationGuard, { passive: true });
-  window.addEventListener("orientationchange", refreshOrientationGuard, { passive: true });
+  orientationFullscreenButton?.addEventListener("click", () => {
+    if (window.matchMedia("(orientation: landscape)").matches) enterCockpitFullscreen();
+  });
+  pwaGuideButton?.addEventListener("click", showPwaGuide);
+  pwaGuideClose?.addEventListener("click", hidePwaGuide);
+  pwaGuide?.addEventListener("click", event => { if (event.target === pwaGuide) hidePwaGuide(); });
 
-  // Prevent browser page gestures while operating the cab. Controls keep their own pointer handling.
+  document.addEventListener("fullscreenchange", () => { refreshFullscreenUi(); updateMobileViewport(); });
+  document.addEventListener("webkitfullscreenchange", () => { refreshFullscreenUi(); updateMobileViewport(); });
+  window.addEventListener("resize", () => { refreshOrientationGuard(); updateMobileViewport(); }, { passive: true });
+  window.addEventListener("orientationchange", () => {
+    setTimeout(refreshOrientationGuard, 80);
+    setTimeout(updateMobileViewport, 120);
+    setTimeout(updateMobileViewport, 400);
+  }, { passive: true });
+  window.visualViewport?.addEventListener("resize", updateMobileViewport, { passive: true });
+  window.visualViewport?.addEventListener("scroll", updateMobileViewport, { passive: true });
+
+  // Suppress page rubber-banding only while the complete cockpit is fitted on screen.
   document.addEventListener("touchmove", event => {
-    if (document.body.classList.contains("fullscreen-active")) event.preventDefault();
+    if (mobile && !body.classList.contains("orientation-blocked")) event.preventDefault();
   }, { passive: false });
 
+  updateMobileViewport();
   refreshFullscreenUi();
   refreshOrientationGuard();
 })();
