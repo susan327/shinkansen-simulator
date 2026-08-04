@@ -1,0 +1,5 @@
+{
+  "name": "shinkansen-atc-simulator",
+  "version": "74.4.3-alpha21-route-strip-step2x",
+  "description": "盛土法面15層を維持し、addRouteStripの分割長だけを2倍にして負荷差を比較する検証版"
+}

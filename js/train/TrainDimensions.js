@@ -1,0 +1,66 @@
+"use strict";
+/** 部品Builder向け互換DTO。値の決定権は TrainReferenceSpec / 各Spec にある。 */
+(() => {
+  const ref = window.TrainReferenceSpec;
+  const spec = window.TrainGeometrySpec;
+  const v = window.TrainVerticalDimensions;
+  const exterior = window.TrainExteriorSpec;
+  if (!ref || !spec || !v || !exterior) throw new Error("Train specs must load before TrainDimensions.");
+  window.TrainDimensions = Object.freeze({
+    carCount: spec.carCount,
+    leadCarLength: spec.formation.find(c => c.type === "lead").length,
+    middleCarLength: spec.formation.find(c => c.type === "middle").length,
+    tailCarLength: spec.formation.find(c => c.type === "tail").length,
+    carLength: spec.formation.find(c => c.type === "middle").length,
+    carGap: spec.carGap,
+    carWidth: spec.carWidth,
+    railTopY: v.railTopY,
+    wheelRadius: v.wheelRadius,
+    wheelCenterY: v.wheelCenterY,
+    floorHeight: v.floorY,
+    floorY: v.floorY,
+    platformTopY: v.platformTopY,
+    bodyBottomY: v.bodyBottomY,
+    bodyHeight: v.bodyHeight,
+    sideWallTopY: v.sideWallTopY,
+    roofHeight: v.roofHeight,
+    bodyTopY: v.roofTopY,
+    roofTopY: spec.roofTopY,
+    noseFrontTopY: spec.noseFrontTopY,
+    overallBodyHeight: v.overallVehicleHeightAboveRail,
+    skirtShoulderY: v.skirtShoulderY,
+    skirtBottomY: v.skirtBottomY,
+    skirtTopWidth: ref.body.width,
+    skirtBottomWidth: ref.body.skirtBottomWidth,
+    underbodyWidth: ref.body.underbodyWidth,
+    doorWidth: ref.details.doorWidth,
+    doorHeight: ref.details.doorHeight,
+    windowWidth: ref.details.windowWidth,
+    windowHeight: ref.details.windowHeight,
+    windowCenterY: ref.details.windowCenterY,
+    stripePrimaryY: ref.details.stripePrimaryY,
+    stripeSecondaryY: ref.details.stripeSecondaryY,
+    windowPitch: ref.details.windowPitch,
+    pillarWidth: ref.details.pillarWidth,
+    noseLength: ref.details.noseLength,
+    stripeSurfaceOffset: ref.details.stripeSurfaceOffset,
+    leadStripeFadeStartDoorInset: ref.details.leadStripeFadeStartDoorInset,
+    leadStripeFadeEndFromTip: ref.details.leadStripeFadeEndFromTip,
+    leadStripeTaperLength: ref.details.leadStripeTaperLength,
+    leadStripeTipClearance: ref.details.leadStripeTipClearance,
+    leadBellyCoverTopY: ref.details.leadBellyCoverTopY,
+    leadBellyCoverBottomY: ref.details.leadBellyCoverBottomY,
+    leadBogieCenterOffset: ref.bogies.lead.centerOffset,
+    middleBogieCenterOffset: ref.bogies.middle.centerOffset,
+    tailBogieCenterOffset: ref.bogies.tail.centerOffset,
+    bogieCenterOffset: ref.bogies.middle.centerOffset,
+    trackGauge: spec.gauge,
+    platformEdgeFromTrackCenter: spec.platformEdgeFromTrackCenter,
+    platformGap: spec.platformGap,
+    leadSkirtTopY: ref.body.skirtShoulderY,
+    leadSkirtBottomY: ref.body.leadSkirtBottomY,
+    routeRailTopOffsetY: ref.route.railTopOffsetY,
+    routeTrainOriginOffsetY: ref.route.trainOriginOffsetY,
+    exteriorSpec: exterior
+  });
+})();

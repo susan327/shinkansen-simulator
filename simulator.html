@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>v74.4.3-alpha21-route-strip-step2x | 新幹線 ATC シミュレーター</title>
+  <link rel="stylesheet" href="css/base.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/layout.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/navigation.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/dashboard.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/controls.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/cockpit-controls.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/responsive.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/features/boarding.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/features/collision.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/features/operation-guidance.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/features/atc-display.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+<link rel="stylesheet" href="css/features/loading.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+  <link rel="stylesheet" href="css/features/performance-monitor.css?v=74.4.3-alpha21-route-strip-step2x-mobile1">
+</head>
+<body>
+<div id="initialLoadingOverlay" class="initial-loading-overlay" aria-live="polite">
+  <div class="initial-loading-card">
+    <div class="initial-loading-title">新幹線ATCシミュレーター</div>
+    <div id="initialLoadingText" class="initial-loading-text">描画エンジンを準備しています…</div>
+    <div class="initial-loading-track"><div id="initialLoadingBar" class="initial-loading-bar"></div></div>
+    <div id="initialLoadingPercent" class="initial-loading-percent">0%</div>
+  </div>
+</div>
+<script>
+(() => {
+  const paint = (value, label) => {
+    const bar=document.getElementById("initialLoadingBar");
+    const text=document.getElementById("initialLoadingText");
+    const percent=document.getElementById("initialLoadingPercent");
+    if(bar) bar.style.width=value+"%";
+    if(text) text.textContent=label;
+    if(percent) percent.textContent=value+"%";
+  };
+  window.__ATC_LOADING_PAINT__=paint;
+  paint(6,"基本画面を準備しています…");
+})();
+</script>
+  <div id="orientationGuard" class="orientation-guard" role="dialog" aria-modal="true">
+    <div class="orientation-card">
+      <div class="rotate-device" aria-hidden="true">📱</div>
+      <strong>スマホを横向きにしてください</strong>
+      <span>v74.4.3-alpha21-route-strip-step2xは横画面専用です</span>
+      <button id="orientationFullscreenButton" class="primary-button" type="button">横向きでフルスクリーン</button>
+    </div>
+  </div>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">HIGH-SPEED RAIL SIMULATOR</p>
+        <h1>新幹線 ATC 運転台 v74.4.3-alpha21-route-strip-step2x</h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="startButton" class="primary-button" type="button">ドアを開く</button>
+        <span id="doorLamp" class="door-lamp" aria-live="polite"><i></i>戸閉</span>
+        <button id="soundToggleButton" class="secondary-button sound-button" type="button" aria-pressed="true">SE：ON</button>
+        <button id="performanceMonitorButton" class="secondary-button" type="button" aria-pressed="false">性能モニター</button>
+        <button id="fullscreenButton" class="secondary-button fullscreen-button" type="button">フルスクリーン</button>
+        <label class="sound-select-wrap atc-editor-hidden" for="soundPresetSelect">基本音色
+          <select id="soundPresetSelect" aria-label="基本音色">
+            <option value="softMuddy">やわらかい濁りベル</option>
+            <option value="mellowBell">丸い電子ベル</option>
+            <option value="warmBox">あたたかい箱鳴り</option>
+            <option value="clothSpeaker">やわらかいスピーカー</option>
+            <option value="resinBell">樹脂質チャイム</option>
+            <option value="hazyResonance">霞んだ共鳴ベル</option>
+            <option value="custom">カスタム</option>
+          </select>
+        </label>
+        <button id="soundTestButton" class="secondary-button atc-editor-hidden" type="button">ATCチャイム 試聴</button>
+        <button id="brake70TestButton" class="secondary-button atc-editor-hidden" type="button">70警報 試聴</button>
+        <button id="resetButton" class="secondary-button" type="button">リセット</button>
+        <a class="secondary-button" href="train-visual-viewer.html" style="text-decoration:none">車両3Dビュアー</a>
+      </div>
+    </header>
+
+
+    <section class="sound-settings-panel" aria-label="ATCチャイム設定">
+      <div class="sound-settings-heading atc-editor-hidden">
+        <div>
+          <span class="section-kicker">CHIME EDITOR</span>
+          <h2>ATCチャイム調整</h2>
+        </div>
+        <button id="soundResetButton" class="secondary-button" type="button">初期値に戻す</button>
+      </div>
+
+      
+      <section class="character-lab atc-editor-hidden" aria-label="音色キャラクター選択">
+        <div class="character-heading">
+          <div><span class="section-kicker">CHARACTER SELECT</span><h3>基本音色から選ぶ</h3></div>
+          <button id="compareVariationsButton" class="secondary-button" type="button">A〜Dを順番に試聴</button>
+        </div>
+        <div class="character-select-grid">
+          <label><span>基本音色</span><select id="toneFamilySelect">
+            <option value="softMuddy">やわらかい濁りベル</option><option value="mellowBell">丸い電子ベル</option><option value="warmBox">あたたかい箱鳴り</option><option value="clothSpeaker">やわらかいスピーカー</option><option value="resinBell">樹脂質チャイム</option><option value="hazyResonance">霞んだ共鳴ベル</option>
+          </select></label>
+          <label><span>バリエーション</span><select id="toneVariationSelect">
+            <option value="A">A・素直で軽め</option><option value="B">B・丸くやわらかい</option><option value="C">C・低い共鳴</option><option value="D">D・霞み／こもり強め</option>
+          </select></label>
+          <button id="applyCharacterButton" class="primary-button" type="button">この音色を適用・試聴</button>
+        </div>
+        <div class="macro-grid">
+          <label><span>濁り <strong id="mudValue">50%</strong></span><input id="mudInput" type="range" min="0" max="100" value="50"></label>
+          <label><span>丸み・箱鳴り <strong id="boxValue">35%</strong></span><input id="boxInput" type="range" min="0" max="100" value="35"></label>
+          <label><span>こもり感 <strong id="speakerValue">30%</strong></span><input id="speakerInput" type="range" min="0" max="100" value="30"></label>
+        </div>
+        <p id="characterDescription" class="character-description">角を抑え、近い音を薄く重ねた、やわらかく濁る電子ベル。</p>
+      </section>
+
+
+      <section class="character-lab atc-editor-hidden" aria-label="ATC目標速度警報">
+        <div class="character-heading">
+          <div><span class="section-kicker">ATC TARGET ALARM</span><h3>ATC目標速度警報</h3></div>
+          <button id="brake70TestButtonPanel" class="secondary-button" type="button">警報を試聴</button>
+        </div>
+        <div class="fixed-alarm-summary">
+          <strong>A5・9連打 × 2セット</strong>
+          <span>1音 0.060秒</span>
+          <span>連打間隔 0.090秒</span>
+          <span>セット間隔 0.49秒</span>
+        </div>
+        <p class="sound-settings-note">警報パターンは固定。停車駅の目標70・目標30で鳴動する。通過区間の速度制限は通常のATCチャイムで知らせる。実速度が各設定速度へ到達した際は通常のATCチャイムが鳴る。</p>
+      </section>
+
+
+
+      <section class="character-lab station-sound-lab station-editor-hidden" aria-label="駅設備音設定">
+        <div class="character-heading">
+          <div><span class="section-kicker">STATION EQUIPMENT SOUNDS</span><h3>ドア開閉音・乗降終了合図</h3></div>
+        </div>
+
+        <div class="station-sound-columns station-sound-columns-v22">
+          <fieldset class="tone-card station-sound-card door-editor-hidden">
+            <legend>ドア開音「ぷしゅー……ガチッ」</legend>
+            <div class="station-test-actions"><button id="doorOpenTestButton" class="secondary-button" type="button">開く音を試聴</button></div>
+            <div class="station-setting-grid">
+              <label><span>空気音の長さ <strong id="openAirDurationValue"></strong></span><input id="openAirDurationInput" type="range" min="0.3" max="3.5" step="0.05"></label>
+              <label><span>空気音の強さ <strong id="openAirLevelValue"></strong></span><input id="openAirLevelInput" type="range" min="0" max="100"></label>
+              <label><span>空気音の高さ <strong id="openAirPitchValue"></strong></span><input id="openAirPitchInput" type="range" min="250" max="3200" step="10"></label>
+              <label><span>ロック音の高さ <strong id="openLockPitchValue"></strong></span><input id="openLockPitchInput" type="range" min="100" max="1800" step="10"></label>
+              <label><span>ロック音の強さ <strong id="openLockLevelValue"></strong></span><input id="openLockLevelInput" type="range" min="0" max="100"></label>
+              <label><span>全体音量 <strong id="openVolumeValue"></strong></span><input id="openVolumeInput" type="range" min="10" max="150" step="5"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="tone-card station-sound-card shared-door-card door-editor-hidden">
+            <legend>ドア閉音「ぷしゅー……ガチッ」（開音と共通設定）</legend>
+            <div class="station-test-actions"><button id="doorCloseTestButton" class="secondary-button" type="button">閉まる音を試聴</button></div>
+            <div class="station-setting-grid">
+              <label><span>空気音の長さ <strong id="closeAirDurationValue"></strong></span><input id="closeAirDurationInput" type="range" disabled min="0.3" max="3.5" step="0.05"></label>
+              <label><span>空気音の強さ <strong id="closeAirLevelValue"></strong></span><input id="closeAirLevelInput" type="range" disabled min="0" max="100"></label>
+              <label><span>空気音の高さ <strong id="closeAirPitchValue"></strong></span><input id="closeAirPitchInput" type="range" disabled min="250" max="3200" step="10"></label>
+              <label><span>ロック音の高さ <strong id="closeLockPitchValue"></strong></span><input id="closeLockPitchInput" type="range" disabled min="100" max="1800" step="10"></label>
+              <label><span>ロック音の強さ <strong id="closeLockLevelValue"></strong></span><input id="closeLockLevelInput" type="range" disabled min="0" max="100"></label>
+              <label><span>全体音量 <strong id="closeVolumeValue"></strong></span><input id="closeVolumeInput" type="range" disabled min="10" max="150" step="5"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="tone-card station-sound-card boarding-buzzer-card">
+            <legend>乗降終了合図「ブーーーー」</legend>
+            <div class="station-test-actions"><button id="boardingBuzzerTestButton" class="secondary-button" type="button">乗降終了合図を試聴</button></div>
+            <div class="station-setting-grid">
+              <label><span>周波数 <strong id="boardingFrequencyValue"></strong></span><input id="boardingFrequencyInput" type="range" min="80" max="1200" step="5"></label>
+              <label><span>長さ <strong id="boardingDurationValue"></strong></span><input id="boardingDurationInput" type="range" min="0.2" max="4" step="0.05"></label>
+              <label><span>音量 <strong id="boardingVolumeValue"></strong></span><input id="boardingVolumeInput" type="range" min="10" max="150" step="5"></label>
+              <label><span>音色</span><select id="boardingWaveSelect"><option value="sine">やわらかい</option><option value="triangle">丸い機械音</option><option value="square">ブザーらしい</option><option value="sawtooth">ざらついた設備音</option></select></label>
+            </div>
+          </fieldset>
+        </div>
+        <p class="sound-settings-note">すべてWebAudioで合成。開閉音は共通設定。設定はブラウザへ自動保存される。駅では「ドア開 → 乗降終了合図 → ドア閉 → 発車可能」の順に操作する。</p>
+      </section>
+
+
+      <section class="character-lab driver-voice-lab" aria-label="運転士自動喚呼">
+        <div class="character-heading">
+          <div><span class="section-kicker">DRIVER CALL OUT</span><h3>運転士の自動喚呼</h3></div>
+          <label class="voice-toggle"><input id="driverVoiceToggle" type="checkbox" checked><span id="driverVoiceStatus">自動喚呼 ON</span></label>
+        </div>
+        <div class="voice-test-grid">
+          <button id="voiceDoorTestButton" class="secondary-button" type="button">「戸閉め点」を試聴</button>
+          <button id="voiceDepartTestButton" class="secondary-button" type="button">「出発進行」を試聴</button>
+          <button id="voiceSignalTestButton" class="secondary-button" type="button">「信号300」を試聴</button>
+          <button id="voiceTargetTestButton" class="secondary-button" type="button">「目標70」を試聴</button>
+          <button id="voice70TestButton" class="secondary-button" type="button">「信号70」を試聴</button>
+          <button id="voice30TestButton" class="secondary-button" type="button">「信号30」を試聴</button>
+          <button id="voiceStopTestButton" class="secondary-button" type="button">「停車」を試聴</button>
+        </div>
+        <p class="sound-settings-note">ブラウザ内蔵の日本語男性音声を優先。ドア閉完了で「戸閉め点」、発車時に「出発進行」→現在信号、加速時に「信号○○」、ATCパターン進入時に「目標○○」、目標速度到達時に「信号○○」、停車時に「停車」と喚呼する。男性音声がない環境では利用可能な日本語音声を使用する。</p>
+      </section>
+      <div class="sound-settings-grid basic-sound-grid atc-editor-hidden">
+        <label><span>ピンの長さ <strong id="pinDurationValue">0.35秒</strong></span><input id="pinDurationInput" type="range" min="0.10" max="1.20" step="0.05" value="0.35"></label>
+        <label><span>ピンの余韻 <strong id="pinReleaseValue">30%</strong></span><input id="pinReleaseInput" type="range" min="10" max="100" step="5" value="30"></label>
+        <label><span>ポーンの長さ <strong id="pongDurationValue">1.30秒</strong></span><input id="pongDurationInput" type="range" min="0.20" max="2.00" step="0.05" value="1.30"></label>
+        <label><span>音の間隔 <strong id="chimeGapValue">0.00秒</strong></span><input id="chimeGapInput" type="range" min="0.00" max="0.60" step="0.01" value="0.00"></label>
+        <label><span>音の重なり <strong id="chimeOverlapValue">0.10秒</strong></span><input id="chimeOverlapInput" type="range" min="0.00" max="0.60" step="0.01" value="0.10"></label>
+        <label><span>音量 <strong id="chimeVolumeValue">100%</strong></span><input id="chimeVolumeInput" type="range" min="20" max="150" step="5" value="100"></label>
+      </div>
+
+      <details class="sound-details atc-editor-hidden" open>
+        <summary>詳細調整（必要なときだけ開く）</summary>
+
+        <fieldset class="tone-card tuning-card">
+          <legend>チューニング</legend>
+          <div class="tuning-grid">
+            <label><span>全体チューニング <strong id="globalTuningValue">0 cent</strong></span><input id="globalTuningInput" type="range" min="-100" max="100" step="1" value="0"></label>
+            <label><span>ピン音程微調整 <strong id="pinTuningValue">0 cent</strong></span><input id="pinTuningInput" type="range" min="-50" max="50" step="1" value="0"></label>
+            <label><span>ポン音程微調整 <strong id="pongTuningValue">0 cent</strong></span><input id="pongTuningInput" type="range" min="-50" max="50" step="1" value="0"></label>
+          </div>
+        </fieldset>
+
+        <div class="tone-columns">
+          <fieldset class="tone-card synth-card" data-tone="pin"><legend>ピン</legend>
+            <label class="select-setting"><span>音程（音名＋オクターブ）</span><select id="pinPitchSelect"><option value="261.62557">C4</option><option value="277.18263">C♯4</option><option value="293.66477">D4</option><option value="311.12698">E♭4</option><option value="329.62756">E4</option><option value="349.22823">F4</option><option value="369.99442">F♯4</option><option value="391.99544">G4</option><option value="415.30470">G♯4</option><option value="440.00000">A4</option><option value="466.16376">B♭4</option><option value="493.88330">B4</option><option value="523.25113">C5</option><option value="554.36526">C♯5</option><option value="587.32954">D5</option><option value="622.25397">E♭5</option><option value="659.25511">E5</option><option value="698.45646">F5</option><option value="739.98885">F♯5</option><option value="783.99087" selected>G5</option><option value="830.60940">G♯5</option><option value="880.00000">A5</option><option value="932.32752">B♭5</option><option value="987.76660">B5</option><option value="1046.50226">C6</option><option value="1108.73052">C♯6</option><option value="1174.65907">D6</option><option value="1244.50793">E♭6</option><option value="1318.51023">E6</option><option value="1396.91293">F6</option><option value="1479.97769">F♯6</option><option value="1567.98174">G6</option><option value="1661.21879">G♯6</option><option value="1760.00000">A6</option><option value="1864.65505">B♭6</option><option value="1975.53321">B6</option><option value="2093.00452">C7</option><option value="2217.46105">C♯7</option><option value="2349.31814">D7</option><option value="2489.01587">E♭7</option><option value="2637.02046">E7</option><option value="2793.82585">F7</option><option value="2959.95538">F♯7</option><option value="3135.96349">G7</option><option value="3322.43758">G♯7</option><option value="3520.00000">A7</option><option value="3729.31009">B♭7</option><option value="3951.06641">B7</option></select></label>
+            <h4>波形ミキサー</h4>
+            <label><span>サイン <strong id="pinSineValue">65%</strong></span><input id="pinSineInput" type="range" min="0" max="100" value="65"></label>
+            <label><span>三角 <strong id="pinTriangleValue">30%</strong></span><input id="pinTriangleInput" type="range" min="0" max="100" value="30"></label>
+            <label><span>矩形 <strong id="pinSquareValue">5%</strong></span><input id="pinSquareInput" type="range" min="0" max="100" value="5"></label>
+            <label><span>のこぎり <strong id="pinSawValue">0%</strong></span><input id="pinSawInput" type="range" min="0" max="100" value="0"></label>
+            <h4>ADSR</h4>
+            <label><span>Attack <strong id="pinAttackValue">0.005秒</strong></span><input id="pinAttackInput" type="range" min="0.001" max="0.20" step="0.001" value="0.005"></label>
+            <label><span>Decay <strong id="pinDecayValue">0.08秒</strong></span><input id="pinDecayInput" type="range" min="0.01" max="0.60" step="0.01" value="0.08"></label>
+            <label><span>Sustain <strong id="pinSustainValue">15%</strong></span><input id="pinSustainInput" type="range" min="1" max="100" value="15"></label>
+            <label><span>Release <strong id="pinEnvReleaseValue">0.10秒</strong></span><input id="pinEnvReleaseInput" type="range" min="0.02" max="1.20" step="0.01" value="0.10"></label>
+            <h4>機器感</h4>
+            <label><span>明るさ <strong id="pinFilterValue">5200Hz</strong></span><input id="pinFilterInput" type="range" min="500" max="12000" step="100" value="5200"></label>
+            <label><span>歪み <strong id="pinDriveValue">3%</strong></span><input id="pinDriveInput" type="range" min="0" max="30" value="3"></label>
+          </fieldset>
+
+          <fieldset class="tone-card synth-card" data-tone="pong"><legend>ポーン</legend>
+            <label class="select-setting"><span>音程（音名＋オクターブ）</span><select id="pongPitchSelect"><option value="261.62557">C4</option><option value="277.18263">C♯4</option><option value="293.66477">D4</option><option value="311.12698">E♭4</option><option value="329.62756">E4</option><option value="349.22823">F4</option><option value="369.99442">F♯4</option><option value="391.99544">G4</option><option value="415.30470">G♯4</option><option value="440.00000">A4</option><option value="466.16376">B♭4</option><option value="493.88330">B4</option><option value="523.25113">C5</option><option value="554.36526">C♯5</option><option value="587.32954">D5</option><option value="622.25397" selected>E♭5</option><option value="659.25511">E5</option><option value="698.45646">F5</option><option value="739.98885">F♯5</option><option value="783.99087">G5</option><option value="830.60940">G♯5</option><option value="880.00000">A5</option><option value="932.32752">B♭5</option><option value="987.76660">B5</option><option value="1046.50226">C6</option><option value="1108.73052">C♯6</option><option value="1174.65907">D6</option><option value="1244.50793">E♭6</option><option value="1318.51023">E6</option><option value="1396.91293">F6</option><option value="1479.97769">F♯6</option><option value="1567.98174">G6</option><option value="1661.21879">G♯6</option><option value="1760.00000">A6</option><option value="1864.65505">B♭6</option><option value="1975.53321">B6</option><option value="2093.00452">C7</option><option value="2217.46105">C♯7</option><option value="2349.31814">D7</option><option value="2489.01587">E♭7</option><option value="2637.02046">E7</option><option value="2793.82585">F7</option><option value="2959.95538">F♯7</option><option value="3135.96349">G7</option><option value="3322.43758">G♯7</option><option value="3520.00000">A7</option><option value="3729.31009">B♭7</option><option value="3951.06641">B7</option></select></label>
+            <h4>波形ミキサー</h4>
+            <label><span>サイン <strong id="pongSineValue">80%</strong></span><input id="pongSineInput" type="range" min="0" max="100" value="80"></label>
+            <label><span>三角 <strong id="pongTriangleValue">20%</strong></span><input id="pongTriangleInput" type="range" min="0" max="100" value="20"></label>
+            <label><span>矩形 <strong id="pongSquareValue">0%</strong></span><input id="pongSquareInput" type="range" min="0" max="100" value="0"></label>
+            <label><span>のこぎり <strong id="pongSawValue">0%</strong></span><input id="pongSawInput" type="range" min="0" max="100" value="0"></label>
+            <h4>ADSR</h4>
+            <label><span>Attack <strong id="pongAttackValue">0.012秒</strong></span><input id="pongAttackInput" type="range" min="0.001" max="0.20" step="0.001" value="0.012"></label>
+            <label><span>Decay <strong id="pongDecayValue">0.22秒</strong></span><input id="pongDecayInput" type="range" min="0.01" max="0.80" step="0.01" value="0.22"></label>
+            <label><span>Sustain <strong id="pongSustainValue">42%</strong></span><input id="pongSustainInput" type="range" min="1" max="100" value="42"></label>
+            <label><span>Release <strong id="pongEnvReleaseValue">0.55秒</strong></span><input id="pongEnvReleaseInput" type="range" min="0.02" max="1.80" step="0.01" value="0.55"></label>
+            <h4>機器感</h4>
+            <label><span>明るさ <strong id="pongFilterValue">4200Hz</strong></span><input id="pongFilterInput" type="range" min="500" max="12000" step="100" value="4200"></label>
+            <label><span>歪み <strong id="pongDriveValue">2%</strong></span><input id="pongDriveInput" type="range" min="0" max="30" value="2"></label>
+          </fieldset>
+        </div>
+
+        <div class="sound-io-row">
+          <button id="soundExportButton" class="secondary-button" type="button">設定を書き出す</button>
+          <button id="soundImportButton" class="secondary-button" type="button">設定を読み込む</button>
+          <textarea id="soundJsonArea" rows="4" placeholder="ここに設定JSONをコピー／貼り付け"></textarea>
+        </div>
+      </details>
+      <div class="fixed-chime-summary"><strong>ATCチャイム：固定音色</strong><span>G5 → E♭5（1オクターブ下げ）</span><span>重なり・微調整済み</span></div><p class="sound-settings-note">ATCチャイムは正式設定で固定。上部の「ATCチャイム 試聴」から確認できる。</p>
+    </section>
+
+    <section class="cab-console" aria-label="新幹線運転台">
+    
+<div class="environment-control-panel" aria-label="時間帯と天気">
+  <label>時間
+    <select id="timeOfDaySelect">
+      <option value="morning">朝</option>
+      <option value="day" selected>昼</option>
+      <option value="evening">夕</option>
+      <option value="night">夜</option>
+    </select>
+  </label>
+  <label>天気
+    <select id="weatherSelect">
+      <option value="clear" selected>晴れ</option>
+      <option value="cloudy">曇り</option>
+      <option value="rain">雨</option>
+      <option value="fog">霧</option>
+    </select>
+  </label>
+</div>
+<section class="forward-view" aria-label="前面展望">
+      <canvas id="sceneryCanvas" width="1280" height="430"></canvas>
+      <div class="cockpit-overlay" aria-hidden="true">
+        <div class="cockpit-roof"></div><div class="cockpit-pillar left"></div><div class="cockpit-pillar right"></div>
+        <div class="cockpit-dash"></div><div class="driver-nose"><span></span></div>
+        <div class="wiper left"></div><div class="wiper right"></div>
+      </div>
+      <div id="doorScene" class="door-scene hidden v67-three-boarding" aria-label="ホーム側ドア扱い画面">
+        <canvas id="boardingCanvas" aria-label="Three.js 乗降風景"></canvas>
+        <div class="v67-boarding-hud">
+        <div class="platform-roof"></div>
+        <div class="door-scene-title"><strong id="doorSceneStation">旭ヶ丘</strong><span>1号車 乗降口</span></div>
+        <div class="car-side">
+          <div class="car-roof-shadow"></div>
+          <div class="car-blue-line"></div>
+
+          <div class="passenger-window-row" aria-hidden="true">
+            <div class="car-window"></div><div class="car-window"></div><div class="car-window"></div><div class="car-window"></div>
+            <div class="car-window"></div><div class="car-window"></div><div class="car-window"></div><div class="car-window"></div>
+            <div class="car-window"></div><div class="car-window"></div><div class="car-window"></div><div class="car-window"></div>
+            <div class="car-window"></div><div class="car-window"></div><div class="car-window"></div><div class="car-window"></div>
+          </div>
+
+          <div class="door-unit door-unit-left">
+            <div class="door-opening"><div class="doorway-light"></div></div>
+            <div class="door-pocket" aria-hidden="true"></div>
+            <div class="single-door" data-door-direction="-1">
+              <div class="door-window"></div><div class="door-handle"></div>
+            </div>
+            <div class="door-step"></div>
+          </div>
+
+          <div class="door-unit door-unit-right">
+            <div class="door-opening"><div class="doorway-light"></div></div>
+            <div class="door-pocket" aria-hidden="true"></div>
+            <div class="single-door" data-door-direction="1">
+              <div class="door-window"></div><div class="door-handle"></div>
+            </div>
+            <div class="door-step"></div>
+          </div>
+
+          <div id="passengerEndLamp" class="car-indicator passenger-end"><span></span>客終</div>
+          <div id="doorClosedSceneLamp" class="car-indicator door-closed"><span></span>戸閉</div>
+        </div>
+        <div class="platform-floor"><div class="platform-yellow"></div></div>
+        <div class="boarding-guide">
+          <div id="doorSceneMessage" class="door-scene-message">ドア開操作を行ってください</div>
+          <button id="boardingSkipButton" class="boarding-skip-button hidden" type="button">乗降スキップ</button>
+          
+        </div>
+        </div>
+      </div>
+      <div class="window-frame" aria-hidden="true">
+        <span class="window-pillar left"></span><span class="window-pillar right"></span>
+        <span class="window-bottom"></span>
+      </div>
+      <div class="view-overlay">
+        <span id="sceneryArea">旭ヶ丘駅</span>
+        <strong><span id="viewSpeed">0</span> km/h</strong>
+      </div>
+    </section>
+
+    <div id="collisionOverlay" class="collision-overlay hidden" aria-live="assertive">
+      <div class="collision-message">
+        <strong id="collisionTitle">車止め衝突！</strong>
+        <span id="collisionSubtitle">がっしゃーん！！</span>
+      </div>
+    </div>
+    <section class="status-strip" aria-live="polite">
+      <span id="statusLamp" class="status-lamp"></span>
+      <strong id="statusText">始発駅で停車中</strong>
+      <span id="messageText">ドアを閉め、ブレーキを緩めて発車してください。</span>
+    </section>
+
+    <section class="dashboard" aria-label="運転情報">
+      <article class="meter-card speed-card">
+        <span class="meter-label">現在速度</span>
+        <div class="meter-value-row">
+          <strong id="speedValue" class="meter-value">0.0</strong>
+          <span class="meter-unit">km/h</span>
+        </div>
+        <div class="bar-track"><div id="speedBar" class="bar-fill"></div></div>
+      </article>
+
+      <article class="meter-card atc-card">
+        <div class="atc-cab-display" aria-label="ATC現示">
+          <span class="atc-cab-label">ATC</span>
+          <div id="atcCircleShell" class="atc-circle-shell">
+            <strong id="atcValue" class="atc-speed-value">30</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="meter-card next-station-card">
+        <span id="nextStationActionLabel" class="meter-label">桜野 通過まで</span>
+        <div class="meter-value-row compact distance-to-station">
+          <strong id="nextStationDistanceValue" class="meter-value">18,000</strong>
+          <span class="meter-unit">m</span>
+        </div>
+        <div class="small-readout"><span>現在位置</span><strong><span id="positionValue">0.000</span> km</strong></div>
+        <span id="remainingValue" class="visually-hidden">52.000 km</span>
+        <span id="stopDistanceValue" class="visually-hidden">52000.0</span>
+      </article>
+
+      <article id="predictionCard" class="meter-card stop-card prediction-card driving-graph-card on-time">
+        <div class="driving-graph-head">
+          <div><span id="predictionTypeLabel" class="meter-label">運転曲線</span><strong id="predictionTimeValue" class="prediction-time compact-time">10:06:00</strong></div>
+          <div class="graph-difference"><span>所定 <b id="nextStationScheduledValue">10:06:00</b></span><strong id="predictionDifferenceValue">±0秒</strong></div>
+        </div>
+        <canvas id="drivingGraphCanvas" width="520" height="150" aria-label="基準速度、実速度、ATC上限の運転曲線"></canvas>
+        <div class="driving-graph-footer">
+          <div class="graph-legend"><span class="legend-target">基準</span><span class="legend-actual">実績</span><span class="legend-atc">ATC</span></div>
+          <div class="small-readout"><span id="diagramModeValue">定通</span><strong id="diagramTargetSpeedValue">70 km/h</strong></div>
+        </div>
+        <span id="manualModeValue" class="visually-hidden">ATC監視</span>
+      </article>
+    </section>
+
+
+    <section class="timetable-panel" aria-label="運転時刻表">
+      <div class="timetable-clock"><span>現在時刻</span><strong id="clockValue">10:00:00</strong></div>
+      <div class="timetable-item"><span>桜野 300km/h通過</span><small>所定 <b id="passScheduledValue">10:06:00</b></small><strong id="passActualValue">--:--:--</strong></div>
+      <div class="timetable-item"><span>青峰 170km/h通過</span><small>所定 <b>10:10:00</b></small><strong>--:--:--</strong></div>
+      <div class="timetable-item"><span>潮見中央 停車</span><small>所定 <b id="arrivalScheduledValue">10:17:30</b></small><strong id="arrivalActualValue">--:--:--</strong></div>
+    </section>
+
+    <section class="route-panel" aria-label="路線進行状況">
+      <div class="route-heading">
+        <div>
+          <span class="section-kicker">ROUTE</span>
+          <h2>旭ヶ丘 → 桜野（300km/h通過）→ 青峰（170km/h通過）→ 潮見中央</h2>
+        </div>
+        <div class="sim-speed-control">
+          <span>進行倍率</span>
+          <button class="rate-button active" data-rate="1" type="button">×1</button>
+          <button class="rate-button" data-rate="2" type="button">×2</button>
+          <button class="rate-button" data-rate="4" type="button">×4</button>
+          <button class="rate-button" data-rate="8" type="button">×8</button>
+        </div>
+      </div>
+
+      <div class="route-line-wrap">
+        <div class="route-line">
+          <div id="trainMarker" class="train-marker" title="列車位置">🚄</div>
+          <div class="station start" style="left: 0%"><span></span><b>旭ヶ丘</b><small>0.0km</small></div>
+          <div class="station pass" style="left: 34.62%"><span></span><b>桜野</b><small>18.0km・300通過</small></div>
+          <div class="station pass" style="left: 61.54%"><span></span><b>青峰</b><small>32.0km・170通過</small></div>
+          <div class="station stop" style="left: 100%"><span></span><b>潮見中央</b><small>52.0km・停車</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="control-grid">
+      <article class="control-card power-control-card">
+        <div class="control-header">
+          <div>
+            <span class="section-kicker">POWER</span>
+            <h2>マスコン</h2>
+          </div>
+          <strong id="powerDisplay" class="notch-display">N</strong>
+        </div>
+        <div class="power-lever-assembly" id="powerLeverAssembly" aria-label="マスコンレバー">
+          <div class="power-scale" aria-hidden="true">
+            <span>N</span><span>P1</span><span>P2</span><span>P3</span><span>P4</span><span>P5</span><span>P6</span><span>P7</span><span>P8</span><span>P9</span><span>P10</span><span>P11</span><span>P12</span><span>P13</span>
+          </div>
+          <div class="power-slot"><output id="powerTrackReadout" class="lever-track-readout">N</output><div id="powerLeverHandle" class="power-lever-handle"><span></span></div></div>
+        </div>
+        <div class="button-row lever-fallback">
+          <button id="powerDownButton" type="button">−</button>
+          <button id="powerNeutralButton" type="button">N</button>
+          <button id="powerUpButton" type="button">＋</button>
+        </div>
+        <p>ドラッグ／W・S：P1〜P13</p>
+      </article>
+
+      <article class="control-card brake-control-card">
+        <div class="control-header">
+          <div>
+            <span class="section-kicker">BRAKE</span>
+            <h2>ブレーキ</h2>
+          </div>
+          <strong id="brakeDisplay" class="notch-display brake">B7</strong>
+        </div>
+        <div class="brake-lever-assembly" id="brakeLeverAssembly" aria-label="ブレーキレバー">
+          <div class="brake-scale" aria-hidden="true"><span>非常</span><span>B7</span><span>B6</span><span>B5</span><span>B4</span><span>B3</span><span>B2</span><span>B1</span><span>解除</span></div>
+          <div class="brake-track"><output id="brakeTrackReadout" class="lever-track-readout brake-readout">B7</output><div id="brakeLeverHandle" class="brake-lever-handle"><span></span></div></div>
+        </div>
+        <div class="button-row brake-actions">
+          <button id="brakeReleaseButton" type="button">緩める</button>
+          <button id="brakeFullReleaseButton" class="release-button" type="button">解除</button>
+          <button id="brakeStrengthenButton" type="button">強める</button>
+          <button id="atcConfirmButton" class="atc-confirm-button" type="button" disabled>ATC確認</button>
+        </div>
+        <p>左右ドラッグ／↑↓：ブレーキ　C長押し：ATC確認　<span id="atcConfirmStatus">待機</span></p>
+      </article>
+
+      <article class="control-card telemetry-card operation-control-card">
+        <div class="control-header">
+          <div>
+            <span class="section-kicker">TELEMETRY</span>
+            <h2>制御状態</h2>
+          </div>
+        </div>
+        <dl class="telemetry-list v662-hidden-telemetry">
+          <div><dt>加速度</dt><dd id="accelerationValue">0.000 m/s²</dd></div>
+          <div><dt>勾配</dt><dd id="gradientValue">→ 0.0‰</dd></div>
+          <div><dt>標高</dt><dd id="elevationValue">0.0 m</dd></div>
+          <div><dt>ATCブレーキ</dt><dd id="atcBrakeValue">0%</dd></div>
+          <div><dt>運転フェーズ</dt><dd id="phaseValue">READY</dd></div>
+          <div><dt>通過駅</dt><dd id="passStationValue">未通過</dd></div>
+        </dl>
+        <div class="v662-lower-console">
+          <section class="v662-status-row" aria-label="状態表示">
+            <strong class="v662-row-label">状態表示</strong>
+            <span><i class="v662-led on"></i><b id="v662RunStatus">停車中</b></span>
+            <span><i class="v662-led on"></i><b id="v662AtcStatus">ATC監視中</b></span>
+            <span><i id="v662DoorLed" class="v662-led"></i><b>戸閉ランプ</b></span>
+            <span id="v662PassengerEnd" class="v662-passenger-end hidden"><i class="v662-led amber"></i><b>客終</b></span>
+            <span><b id="v662BuzzerStatus">ブザー停止中</b></span>
+          </section>
+          <section class="v662-operation-row" aria-label="操作パネル">
+            <strong class="v662-row-label">操作パネル</strong>
+            <button id="v662DoorButton" class="v662-op door" type="button">ドア開閉</button>
+            <button id="v662AtcButton" class="v662-op atc" type="button">ATC確認</button>
+            <button id="v662AutoCallButton" class="v662-op call" type="button">自動喚呼 ON</button>
+            <button id="v662OptionButton" class="v662-op" type="button">⚙ オプション</button>
+            <button id="v662FullscreenButton" class="v662-op full" type="button">全画面</button>
+            <button id="v662ResetButton" class="v662-op reset" type="button">リセット</button>
+          </section>
+        </div>
+        <details id="motorMixerPanel" class="motor-mixer floating-mixer-panel">
+          <summary>走行音ミキサー</summary>
+          <div class="motor-mixer-grid">
+            <label><span>モーター</span><input id="motorVolumeInput" type="range" min="0" max="200" value="100"><output id="motorVolumeOutput">100%</output></label>
+            <label><span>惰性走行</span><input id="coastVolumeInput" type="range" min="0" max="250" value="155"><output id="coastVolumeOutput">155%</output></label>
+            <label><span>回生音</span><input id="regenVolumeInput" type="range" min="0" max="200" value="100"><output id="regenVolumeOutput">100%</output></label>
+            <label><span>風切り音</span><input id="windVolumeInput" type="range" min="0" max="200" value="100"><output id="windVolumeOutput">100%</output></label>
+          </div>
+        </details>
+      </article>
+    </section>
+
+    </section>
+
+    <section class="event-panel">
+      <div class="event-header">
+        <div>
+          <span class="section-kicker">EVENT LOG</span>
+          <h2>運転イベント</h2>
+        </div>
+        <span class="key-guide">Enter：開始　R：リセット</span>
+      </div>
+      <ol id="eventLog" class="event-log">
+        <li>旭ヶ丘駅に停車中。ドア扱い待ち。</li>
+      </ol>
+    </section>
+
+    <section id="resultPanel" class="result-panel hidden" aria-live="polite">
+      <span class="section-kicker">RESULT</span>
+      <h2 id="resultTitle">停車しました</h2>
+      <p id="resultText"></p>
+      <button id="resultResetButton" class="primary-button" type="button">もう一度運転する</button>
+    </section>
+  </main>
+
+    <div class="floating-operation-tools" aria-label="運転補助操作">
+      <button id="mixerOptionButton" class="mixer-option-button" type="button" aria-controls="motorMixerPanel" aria-expanded="false">⚙ オプション</button>
+      <button id="atcConfirmFloatButton" class="atc-confirm-button floating-atc-confirm" type="button" disabled>ATC確認</button>
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script>
+    if (typeof THREE === "undefined") {
+      document.write('<script src="https://unpkg.com/three@0.160.0/build/three.min.js"><\/script>');
+    }
+  </script>
+  <script src="js/train/specs/TrainReferenceSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/RailPlatformDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/TrainVerticalDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/specs/TrainConsistSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/specs/BogieSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/designer/TrainDesignerSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/designer/TrainDesignStore.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/specs/TrainExteriorSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/specs/BodyProfileSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/specs/TrainClearanceSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/TrainGeometrySpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/core/config.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/content/routes/main-route/route-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/content/stations/station-configs.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+<script src="js/world/stations/StationTrackSpacingSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+<script src="js/world/stations/StationTurnoutSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/stations/StationWorldSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+<script src="js/world/stations/StationStructureSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+<script src="js/world/stations/StationLayoutValidation.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+<script src="js/world/stations/TrackLayoutBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/stations/PassengerZoneSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/content/routes/main-route/roadbed-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/roadbed/roadbed-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/roadbed/roadbed-renderer.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/content/routes/main-route/structure-segments.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/core/event-bus.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/route/route-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/track/track-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/stations/station-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/scenery-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/content/routes/main-route/scenery-zone-data.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/terrain/clearance-manager.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/terrain/terrain-surface.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/urban-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/commercial-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/residential-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/orchard-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/rural-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/hilly-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/mountain-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/industrial-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/solar-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/highway-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/harbor-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/coast-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/world/scenery/zones/river-generator.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/systems/timetable/timetable-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/ui/driving-graph/driving-graph-view.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/core/math-utils.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/systems/departure/departure-sequence.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/systems/atc/atc-engine.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/systems/train/train-physics.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/TrainDimensions.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/materials/TrainMaterials.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/geometry/TrainShapeProfile.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/geometry/TrainLeadGeometry.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/geometry/TrainUnderbodyGeometry.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/parts/helpers.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/body.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/roof.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/doors.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/windows.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/bogie.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/underfloor.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/pantograph.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/skirt.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/parts/cab.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/parts/lead-aero.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script><script src="js/train/parts/lead-car.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/builders/UnderbodyShieldBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/builders/LeadCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/builders/MiddleCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/builders/TailCarBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/debug/TrainGeometryDebug.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/debug/TrainValidation.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/builders/TrainConsistBuilder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/placement/TrainPlacement.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/runtime/TrainInstance.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/rendering/TrainRenderAdapter.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/train-builder.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/core/app.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/systems/train/train-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/systems/atc/atc-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/ui/ui-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/ui/operation-panel-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/stations/specs/StationTrackLayoutSpec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/stations/specs/StationVerticalLayout.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/stations/platform-layout.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/boarding/boarding-camera.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/boarding/passenger-path.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/train/consist-spec.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/boarding/boarding-scene-system.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+  <script src="js/systems/station/boarding-controller.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+
+<div id="performanceMonitor" class="performance-monitor" hidden aria-hidden="true">
+  <div class="performance-monitor__header">
+    <div><strong>PERFORMANCE MONITOR</strong><span>検証用・全項目表示</span></div>
+    <button id="performanceMonitorClose" type="button">閉じる ×</button>
+  </div>
+  <div id="performanceMonitorGrid" class="performance-monitor__grid"></div>
+  <div class="performance-monitor__note">※ CPU/GPU使用率そのものではなく、ブラウザから取得できる処理時間と描画統計です。スクリーンショット比較用。</div>
+</div>
+  <script src="js/ui/performance-monitor.js?v=74.4.3-alpha21-route-strip-step2x-mobile1"></script>
+</body>
+</html>

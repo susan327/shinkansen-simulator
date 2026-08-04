@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>新幹線ATCシミュレーター | 開発中β体験版</title>
+  <style>
+    :root{color-scheme:dark;font-family:"Segoe UI","Yu Gothic UI",sans-serif}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;color:#eef8ff;background:radial-gradient(circle at 50% 18%,#173f63 0,#07121e 46%,#02070c 100%);overflow:auto}
+    .title-shell{width:min(980px,calc(100% - 32px));padding:44px 22px;text-align:center}
+    .mark{font-size:clamp(48px,9vw,92px);filter:drop-shadow(0 12px 30px rgba(55,181,255,.35))}
+    .eyebrow{margin:10px 0 8px;letter-spacing:.18em;color:#70cfff;font-weight:800}
+    h1{margin:0;font-size:clamp(30px,6vw,62px);line-height:1.12}
+    .beta{display:inline-block;margin-top:14px;padding:7px 14px;border:1px solid #64caff;border-radius:999px;color:#9bddff;background:rgba(22,101,151,.22);font-weight:800}
+    .lead{max-width:720px;margin:24px auto 30px;color:#bfd1df;line-height:1.8}
+    .profiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:760px;margin:auto}
+    .profile{display:flex;min-height:190px;flex-direction:column;justify-content:space-between;padding:24px;border:1px solid rgba(121,207,255,.28);border-radius:20px;background:rgba(8,25,39,.82);box-shadow:0 18px 55px rgba(0,0,0,.35);text-align:left}
+    .profile.recommended{border-color:#69d3ff;box-shadow:0 18px 65px rgba(24,148,211,.18)}
+    .profile h2{margin:0 0 8px;font-size:30px}
+    .profile p{margin:0;color:#b8cbd8;line-height:1.65}
+    .tag{font-size:12px;color:#86dcff;font-weight:900;letter-spacing:.08em}
+    .start{display:block;margin-top:22px;padding:15px 18px;border-radius:12px;text-align:center;text-decoration:none;font-weight:900;color:#03111a;background:linear-gradient(135deg,#71d7ff,#d2f4ff);transition:transform .15s ease,filter .15s ease}
+    .start:hover{transform:translateY(-2px);filter:brightness(1.07)}
+    .notes{margin:28px auto 0;max-width:760px;color:#839bab;font-size:14px;line-height:1.7}
+    .version{margin-top:22px;color:#608097;font-family:Consolas,monospace;font-size:12px}
+    @media(max-width:680px){.profiles{grid-template-columns:1fr}.title-shell{padding-top:28px}}
+  </style>
+</head>
+<body>
+  <main class="title-shell">
+    <div class="mark" aria-hidden="true">🚄</div>
+    <p class="eyebrow">HIGH-SPEED RAIL SIMULATOR</p>
+    <h1>新幹線ATCシミュレーター</h1>
+    <span class="beta">開発中β体験版</span>
+    <p class="lead">運転システム先行公開版。車両・駅・景観は継続して改良中です。PCの性能や静音性に合わせて描画モードを選んでください。</p>
+    <section class="profiles" aria-label="描画モード選択">
+      <article class="profile recommended">
+        <div><span class="tag">おすすめ・低負荷</span><h2>30 FPS</h2><p>発熱とファン音を抑える検証モード。ノートPCや省電力運転、安定性確認に向いています。</p></div>
+        <a class="start" href="simulator.html?fps=30">30 FPSで開始</a>
+      </article>
+      <article class="profile">
+        <div><span class="tag">滑らかさ優先</span><h2>60 FPS</h2><p>運転景観の滑らかさを優先。30 FPS版との負荷・温度・ファン音比較にも使えます。</p></div>
+        <a class="start" href="simulator.html?fps=60">60 FPSで開始</a>
+      </article>
+    </section>
+    <p class="notes">両モードとも物理・ATC・走行距離の固定ステップ計算は共通です。変更されるのは主に描画更新頻度です。</p>
+    <div class="version">v74.4.3-alpha21-route-strip-step2x-mobile1</div>
+  </main>
+</body>
+</html>
